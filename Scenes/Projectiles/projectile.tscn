@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://cxw2yxt3vqx32"]
+
+[ext_resource type="Script" uid="uid://47jhqr7nyhe0" path="res://Scripts/Combat/Projectile.cs" id="1_aihi3"]
+[ext_resource type="Texture2D" uid="uid://clxk1jux36870" path="res://Art/bullet_transparent.png" id="2_c3q3r"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_o6i24"]
+size = Vector2(312, 124)
+
+[node name="Projectile" type="Area2D" unique_id=1883273979]
+scale = Vector2(0.1, 0.1)
+collision_mask = 4
+script = ExtResource("1_aihi3")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1489434638]
+texture = ExtResource("2_c3q3r")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1645042066]
+position = Vector2(108, 0)
+shape = SubResource("RectangleShape2D_o6i24")

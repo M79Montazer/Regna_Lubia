@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://ctvh1lk3n17su"]
+
+[ext_resource type="Texture2D" uid="uid://bwo8xbowic2bb" path="res://Art/room4_edit2.png" id="1_a10v0"]
+[ext_resource type="PackedScene" uid="uid://bmednj0jlxh6f" path="res://Scenes/World/room_transition.tscn" id="2_jxhdo"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0pkdl"]
+size = Vector2(1331, 175)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jxhdo"]
+size = Vector2(134, 568)
+
+[node name="Hallway" type="Node2D" unique_id=575576604]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1706212991]
+texture = ExtResource("1_a10v0")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Sprite2D" unique_id=1335109245]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/StaticBody2D" unique_id=2058006478]
+position = Vector2(-4.5, 404)
+shape = SubResource("RectangleShape2D_0pkdl")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Sprite2D/StaticBody2D" unique_id=1664704647]
+position = Vector2(670, 52)
+shape = SubResource("RectangleShape2D_jxhdo")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="Sprite2D/StaticBody2D" unique_id=1403191941]
+position = Vector2(-661, 56)
+shape = SubResource("RectangleShape2D_jxhdo")
+
+[node name="Enemies" type="Node2D" parent="." unique_id=427005661]
+
+[node name="Spawns" type="Node" parent="." unique_id=1581447768]
+
+[node name="Spawn_From_Door_01" type="Marker2D" parent="Spawns" unique_id=261256606]
+position = Vector2(-522, 135)
+
+[node name="Spawn_Start" type="Marker2D" parent="Spawns" unique_id=630563617]
+position = Vector2(-108, 162)
+
+[node name="Props" type="Node2D" parent="." unique_id=1500527791]
+position = Vector2(383, 145)
+
+[node name="DoorToBedroom" parent="Props" unique_id=503291503 instance=ExtResource("2_jxhdo")]
+position = Vector2(-964, -66.00001)
+scale = Vector2(0.4, 0.4)
+
+[node name="RoomToBalcony" parent="Props" unique_id=1285732230 instance=ExtResource("2_jxhdo")]
+position = Vector2(174.99998, -49.999996)
+scale = Vector2(0.4, 0.4)
+StartsLocked = true
+RequiredKeyId = "rusty_key"

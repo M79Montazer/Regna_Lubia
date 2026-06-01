@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://cruxm2svouvos"]
+
+[ext_resource type="Script" uid="uid://bc8dk3nflso3a" path="res://Scripts/Props/PickupItem.cs" id="1_m7jw3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_h51vs"]
+size = Vector2(387, 735)
+
+[node name="PickupItem" type="Area2D" unique_id=931302512]
+script = ExtResource("1_m7jw3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=432074066]
+position = Vector2(21.5, -104.5)
+shape = SubResource("RectangleShape2D_h51vs")
+debug_color = Color(0.92979205, 0.13230464, 0.5723159, 0.41960785)

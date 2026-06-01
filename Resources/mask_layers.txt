@@ -1,0 +1,17 @@
+mask layers:
+Layer 1: world geometry
+Layer 2: player
+Layer 3: enemy
+Layer 4: interactables
+Layer 5: player attacks / projectiles
+
+
+z-index:
+Layer	Z Index
+Background walls		-10
+Floor					0
+Items					5
+Player					10
+Enemies					10
+Foreground decorations	20
+UI						CanvasLayer

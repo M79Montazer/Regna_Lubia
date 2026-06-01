@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://cjgbm511qaxdu"]
+
+[ext_resource type="Script" uid="uid://k813hlbbg2pk" path="res://Scripts/Player/PlayerController.cs" id="1_0u5uq"]
+[ext_resource type="Texture2D" uid="uid://qc4j7pcc0mdt" path="res://Art/Lubia_transparent.png" id="1_uvnfx"]
+[ext_resource type="Script" uid="uid://btcffsk6ra02r" path="res://Scripts/Core/Health.cs" id="2_htcer"]
+[ext_resource type="Script" uid="uid://chgfrvbux81v7" path="res://Scripts/Core/Inventory.cs" id="3_dd0ac"]
+[ext_resource type="Script" uid="uid://cgxma7vmmq5vd" path="res://Scripts/Combat/PlayerCombat.cs" id="4_0u5uq"]
+[ext_resource type="PackedScene" uid="uid://cxw2yxt3vqx32" path="res://Scenes/Projectiles/projectile.tscn" id="5_dd0ac"]
+[ext_resource type="Script" uid="uid://5wjlg67hr8li" path="res://Scripts/Player/InteractionDetector.cs" id="5_jlvik"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gk6dx"]
+size = Vector2(208.74997, 747.4999)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jhyir"]
+size = Vector2(421, 659)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_74mp2"]
+radius = 109.0
+height = 722.0
+
+[node name="Player" type="CharacterBody2D" unique_id=773525098]
+z_index = 10
+collision_layer = 3
+script = ExtResource("1_0u5uq")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=767420957]
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("1_uvnfx")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1808751237]
+position = Vector2(-10.5, 15)
+scale = Vector2(0.8, 0.8)
+shape = SubResource("RectangleShape2D_gk6dx")
+debug_color = Color(0.850291, 0.16249126, 0.8182345, 0.41960785)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1166384737]
+
+[node name="Health" type="Node" parent="." unique_id=1401851200]
+script = ExtResource("2_htcer")
+
+[node name="Inventory" type="Node" parent="." unique_id=353867380]
+script = ExtResource("3_dd0ac")
+
+[node name="Combat" type="Node2D" parent="." unique_id=2009491014]
+script = ExtResource("4_0u5uq")
+ProjectileScene = ExtResource("5_dd0ac")
+
+[node name="MeleeHitbox" type="Area2D" parent="Combat" unique_id=1047814422]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Combat/MeleeHitbox" unique_id=998590299]
+position = Vector2(321, 1.5)
+shape = SubResource("RectangleShape2D_jhyir")
+
+[node name="MeleeCooldownTimer" type="Timer" parent="Combat" unique_id=493093296]
+one_shot = true
+
+[node name="RangedCooldownTimer" type="Timer" parent="Combat" unique_id=947769642]
+one_shot = true
+
+[node name="InteractionDetector" type="Area2D" parent="." unique_id=1982834511]
+script = ExtResource("5_jlvik")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionDetector" unique_id=281350782]
+shape = SubResource("CapsuleShape2D_74mp2")

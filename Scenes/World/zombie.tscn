@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://bhgddshq0333e"]
+
+[ext_resource type="Script" uid="uid://b3ojd1w4yd3xs" path="res://Scripts/World/Enemy.cs" id="1_di8it"]
+[ext_resource type="Texture2D" uid="uid://dnhnq0xb47vn3" path="res://Art/zombie_transparent.png" id="2_hxbmt"]
+[ext_resource type="Script" uid="uid://btcffsk6ra02r" path="res://Scripts/Core/Health.cs" id="3_ukpr8"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_vrqx1"]
+radius = 258.0
+height = 972.0
+
+[node name="Zombie" type="CharacterBody2D" unique_id=1946540188]
+script = ExtResource("1_di8it")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1793490894]
+texture = ExtResource("2_hxbmt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1390413645]
+position = Vector2(-2, -9)
+shape = SubResource("CapsuleShape2D_vrqx1")
+
+[node name="Health" type="Node" parent="." unique_id=1863113894]
+script = ExtResource("3_ukpr8")
+
+[node name="AttackTimer" type="Timer" parent="." unique_id=2104925204]
+one_shot = true

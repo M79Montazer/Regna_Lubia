@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://4eb6klxdacm3"]
+
+[ext_resource type="PackedScene" uid="uid://cjgbm511qaxdu" path="res://Scenes/Player/player.tscn" id="1_myw4e"]
+[ext_resource type="Script" uid="uid://btiu8f5remqcu" path="res://Scripts/Core/RoomManager.cs" id="2_0vnrk"]
+
+[node name="Main" type="Node2D" unique_id=1171884290]
+
+[node name="RoomManager" type="Node" parent="." unique_id=893744063]
+script = ExtResource("2_0vnrk")
+RoomContainerPath = NodePath("../RoomContainer")
+PlayerPath = NodePath("../Player")
+
+[node name="Player" parent="." unique_id=773525098 instance=ExtResource("1_myw4e")]
+scale = Vector2(0.4, 0.4)
+
+[node name="RoomContainer" type="Node2D" parent="." unique_id=1166386537]

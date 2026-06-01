@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://bmednj0jlxh6f"]
+
+[ext_resource type="Script" uid="uid://cgqmqgid1k5a" path="res://Scripts/Props/RoomTransition.cs" id="1_uogcq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8ypuj"]
+size = Vector2(397, 920)
+
+[node name="RoomTransition" type="Area2D" unique_id=503291503]
+script = ExtResource("1_uogcq")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=311012093]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2016432292]
+position = Vector2(4.5, 3)
+shape = SubResource("RectangleShape2D_8ypuj")
+debug_color = Color(0.07819403, 0.649543, 0, 0.41960785)
