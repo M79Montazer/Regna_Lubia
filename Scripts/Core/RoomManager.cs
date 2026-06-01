@@ -20,6 +20,7 @@ public partial class RoomManager : Node
 	{
 		{"Bedroom","res://Scenes/World/bedroom.tscn"},
 		{"Hallway","res://Scenes/World/hallway.tscn"},
+		{"Balcony","res://Scenes/World/balcony.tscn"},
 
 	};
 

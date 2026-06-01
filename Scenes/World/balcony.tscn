@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://ctvh1lk3n17su"]
+[gd_scene format=3 uid="uid://c7gb42ia5k4qg"]
 
-[ext_resource type="Texture2D" uid="uid://bwo8xbowic2bb" path="res://Art/room4_edit2.png" id="1_a10v0"]
-[ext_resource type="PackedScene" uid="uid://bmednj0jlxh6f" path="res://Scenes/World/room_transition.tscn" id="2_jxhdo"]
+[ext_resource type="Texture2D" uid="uid://dm0gllfogbkj3" path="res://Art/Balcony.png" id="1_5vvvu"]
+[ext_resource type="PackedScene" uid="uid://bmednj0jlxh6f" path="res://Scenes/World/room_transition.tscn" id="2_wkd8o"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0pkdl"]
 size = Vector2(1331, 175)
@@ -9,23 +9,23 @@ size = Vector2(1331, 175)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jxhdo"]
 size = Vector2(134, 568)
 
-[node name="Hallway" type="Node2D" unique_id=575576604]
+[node name="Balcony" type="Node2D" unique_id=575576604]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1706212991]
-texture = ExtResource("1_a10v0")
+texture = ExtResource("1_5vvvu")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="Sprite2D" unique_id=1335109245]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/StaticBody2D" unique_id=2058006478]
-position = Vector2(-4.5, 404)
+position = Vector2(-9, 328)
 shape = SubResource("RectangleShape2D_0pkdl")
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Sprite2D/StaticBody2D" unique_id=1664704647]
-position = Vector2(670, 52)
+position = Vector2(606, 55)
 shape = SubResource("RectangleShape2D_jxhdo")
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="Sprite2D/StaticBody2D" unique_id=1403191941]
-position = Vector2(-661, 56)
+position = Vector2(-728, 37)
 shape = SubResource("RectangleShape2D_jxhdo")
 
 [node name="Enemies" type="Node2D" parent="." unique_id=427005661]
@@ -33,24 +33,16 @@ shape = SubResource("RectangleShape2D_jxhdo")
 [node name="Spawns" type="Node" parent="." unique_id=1581447768]
 
 [node name="Spawn_From_Door_01" type="Marker2D" parent="Spawns" unique_id=261256606]
-position = Vector2(-522, 135)
+position = Vector2(-556, 121)
 
 [node name="Spawn_Start" type="Marker2D" parent="Spawns" unique_id=630563617]
-position = Vector2(-108, 162)
-
-[node name="Spawn_From_Door_02" type="Marker2D" parent="Spawns" unique_id=911211869]
-position = Vector2(451, 151)
+position = Vector2(272, 121)
 
 [node name="Props" type="Node2D" parent="." unique_id=1500527791]
 position = Vector2(383, 145)
 
-[node name="DoorToBedroom" parent="Props" unique_id=503291503 instance=ExtResource("2_jxhdo")]
-position = Vector2(-964, -66.00001)
+[node name="DoorToHallway" parent="Props" unique_id=503291503 instance=ExtResource("2_wkd8o")]
+position = Vector2(-970, -87.00001)
 scale = Vector2(0.4, 0.4)
-
-[node name="RoomToBalcony" parent="Props" unique_id=1285732230 instance=ExtResource("2_jxhdo")]
-position = Vector2(174.99998, -49.999996)
-scale = Vector2(0.4, 0.4)
-TargetRoomScene = "Balcony"
-StartsLocked = true
-RequiredKeyId = "rusty_key"
+TargetRoomScene = "Hallway"
+TargetSpawnPath = "Spawns/Spawn_From_Door_02"
