@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://blp3tglt7nuw5"]
+
+[ext_resource type="Texture2D" uid="uid://cgmdwid02010t" path="res://Art/RustyKey.png" id="1_etwe3"]
+[ext_resource type="Script" uid="uid://bbg2s4ongyegi" path="res://Scripts/Items/ItemData.cs" id="1_rr6yy"]
+
+[resource]
+script = ExtResource("1_rr6yy")
+ItemId = "RustyKey"
+DisplayName = "Rusty Key"
+Icon = ExtResource("1_etwe3")
+KeyId = "RustyKey"
+metadata/_custom_type_script = "uid://bbg2s4ongyegi"

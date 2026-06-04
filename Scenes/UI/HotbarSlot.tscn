@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://cpox8kc4rkd8j"]
+
+[ext_resource type="Script" uid="uid://07qkuc1olsbf" path="res://Scripts/UI/HotbarSlot.cs" id="1_5iaem"]
+[ext_resource type="Texture2D" uid="uid://x808y5vha4se" path="res://Art/icon.svg" id="1_otpte"]
+
+[node name="HotbarSlot" type="Button" unique_id=352473301]
+offset_right = 64.0
+offset_bottom = 64.0
+icon = ExtResource("1_otpte")
+flat = true
+script = ExtResource("1_5iaem")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1519361627]
+layout_mode = 0
+offset_right = 134.0
+offset_bottom = 132.0
+expand_mode = 4

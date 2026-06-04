@@ -10,7 +10,6 @@ public partial class RoomTransition : Area2D, IInteractable
 
 	[Export] public bool StartsLocked { get; set; } = false;
 	[Export] public string RequiredKeyId { get; set; } = "";
-	[Export] public bool ConsumeKeyOnUse { get; set; } = false;
 
 	private bool _locked;
 
@@ -19,33 +18,33 @@ public partial class RoomTransition : Area2D, IInteractable
 		_locked = StartsLocked;
 	}
 
-	public string PromptText => _locked ? $"{LabelText} (locked)" : $"Use {LabelText}";
+	public string GetPromptText(PlayerController player)
+	{
+		if (!_locked)
+			return $"Use {LabelText}";
+
+		if (!string.IsNullOrWhiteSpace(RequiredKeyId) && player.Inventory.HasSelectedKey(RequiredKeyId))
+			return $"Unlock {LabelText}";
+
+		return $"{LabelText} (locked)";
+	}
 
 	public bool CanInteract(PlayerController player)
 	{
-		if (!_locked)
-			return true;
-
-		if (string.IsNullOrWhiteSpace(RequiredKeyId))
-			return false;
-
-		return player.Inventory.Has(RequiredKeyId);
+		return true;
 	}
 
 	public void Interact(PlayerController player)
 	{
 		if (_locked)
 		{
-			if (string.IsNullOrWhiteSpace(RequiredKeyId) || !player.Inventory.Has(RequiredKeyId))
+			if (!player.Inventory.HasSelectedKey(RequiredKeyId))
 			{
-				GD.Print("player does not have " + RequiredKeyId);
+				GD.Print("door is locked");
 				return;
 			}
 
 			_locked = false;
-
-			if (ConsumeKeyOnUse)
-				player.Inventory.Remove(RequiredKeyId);
 			GD.Print("player used " + RequiredKeyId + " to open the lock");
 		}
 

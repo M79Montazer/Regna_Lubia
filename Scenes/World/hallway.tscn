@@ -53,4 +53,4 @@ position = Vector2(174.99998, -49.999996)
 scale = Vector2(0.4, 0.4)
 TargetRoomScene = "Balcony"
 StartsLocked = true
-RequiredKeyId = "rusty_key"
+RequiredKeyId = "RustyKey"

@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://cjgbm511qaxdu" path="res://Scenes/Player/player.tscn" id="1_myw4e"]
 [ext_resource type="Script" uid="uid://btiu8f5remqcu" path="res://Scripts/Core/RoomManager.cs" id="2_0vnrk"]
 [ext_resource type="PackedScene" uid="uid://mj1y72nqcf51" path="res://Scenes/UI/Hud.tscn" id="3_4narx"]
+[ext_resource type="PackedScene" uid="uid://cpox8kc4rkd8j" path="res://Scenes/UI/HotbarSlot.tscn" id="4_jl77m"]
 
 [node name="Main" type="Node2D" unique_id=1171884290]
 
@@ -18,3 +19,4 @@ scale = Vector2(0.4, 0.4)
 
 [node name="Hud" parent="." unique_id=601743407 instance=ExtResource("3_4narx")]
 PlayerPath = NodePath("../Player")
+HotbarSlotScene = ExtResource("4_jl77m")

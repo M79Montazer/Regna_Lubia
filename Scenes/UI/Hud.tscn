@@ -2,17 +2,36 @@
 
 [ext_resource type="Script" uid="uid://ddirl5g4yqyfc" path="res://Scripts/UI/Hud.cs" id="1_ks3ap"]
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ks3ap"]
+
 [node name="Hud" type="CanvasLayer" unique_id=601743407]
 script = ExtResource("1_ks3ap")
 
 [node name="Panel" type="Panel" parent="." unique_id=106088576]
-offset_right = 120.0
-offset_bottom = 100.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_ks3ap")
+
+[node name="BottomBar" type="PanelContainer" parent="Panel" unique_id=244789361]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 622.0
+offset_right = 1182.0
+offset_bottom = 715.0
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel/BottomBar" unique_id=2020451901]
+layout_mode = 2
+
+[node name="HotbarSlots" type="HBoxContainer" parent="Panel/BottomBar/MarginContainer" unique_id=246606382]
+layout_mode = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="Panel" unique_id=1377246353]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 44.0
+offset_bottom = 50.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer" unique_id=2013446405]
 layout_mode = 2
@@ -23,5 +42,26 @@ layout_mode = 2
 [node name="HealthLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer" unique_id=1073232451]
 layout_mode = 2
 
-[node name="InventoryLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer" unique_id=1741653404]
+[node name="ReadablePanel" type="PanelContainer" parent="." unique_id=254292143]
+visible = false
+offset_left = 463.0
+offset_top = 201.0
+offset_right = 846.0
+offset_bottom = 483.0
+
+[node name="MarginContainer" type="MarginContainer" parent="ReadablePanel" unique_id=290567407]
 layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ReadablePanel/MarginContainer" unique_id=1068009485]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="ReadablePanel/MarginContainer/VBoxContainer" unique_id=1980558110]
+layout_mode = 2
+
+[node name="TextLabel" type="RichTextLabel" parent="ReadablePanel/MarginContainer/VBoxContainer" unique_id=1681111342]
+layout_mode = 2
+text = "hi
+I am"
+fit_content = true
+scroll_following = true
+scroll_following_visible_characters = true
