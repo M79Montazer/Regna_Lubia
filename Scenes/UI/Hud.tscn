@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://mj1y72nqcf51"]
+
+[ext_resource type="Script" uid="uid://ddirl5g4yqyfc" path="res://Scripts/UI/Hud.cs" id="1_ks3ap"]
+
+[node name="Hud" type="CanvasLayer" unique_id=601743407]
+script = ExtResource("1_ks3ap")
+
+[node name="Panel" type="Panel" parent="." unique_id=106088576]
+offset_right = 120.0
+offset_bottom = 100.0
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel" unique_id=1377246353]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer" unique_id=2013446405]
+layout_mode = 2
+
+[node name="PromptLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer" unique_id=1811317552]
+layout_mode = 2
+
+[node name="HealthLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer" unique_id=1073232451]
+layout_mode = 2
+
+[node name="InventoryLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer" unique_id=1741653404]
+layout_mode = 2

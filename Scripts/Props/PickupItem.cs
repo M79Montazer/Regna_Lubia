@@ -2,10 +2,10 @@ using Godot;
 
 public partial class PickupItem : Area2D, IInteractable
 {
-	[Export] public string ItemId { get; set; } = "rusty_key";
-	[Export] public string ItemName { get; set; } = "Rusty Key";
+	[Export] public string ItemId { get; set; }
+	[Export] public string ItemName { get; set; }
 
-	public string PromptText => $"Pick up {ItemName}";
+	public string PromptText => $"{ItemName}";
 
 	public bool CanInteract(PlayerController player) => true;
 
