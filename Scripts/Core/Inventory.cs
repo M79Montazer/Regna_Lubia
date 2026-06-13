@@ -5,11 +5,11 @@ public partial class Inventory : Node
 {
 	[Export] public int SlotCount { get; set; } = 8;
 
-	private ItemData?[] _slots = Array.Empty<ItemData?>();
+	private ItemData[] _slots = [];
 	public int SelectedSlotIndex { get; private set; } = -1;
 
 	public event Action? InventoryChanged;
-	public event Action<int, ItemData?>? SelectionChanged;
+	public event Action<int, ItemData> SelectionChanged;
 
 	public override void _Ready()
 	{
@@ -19,7 +19,7 @@ public partial class Inventory : Node
 		_slots = new ItemData?[SlotCount];
 	}
 
-	public ItemData? GetSlot(int index)
+	public ItemData GetSlot(int index)
 	{
 		if (index < 0 || index >= _slots.Length)
 			return null;
@@ -27,7 +27,7 @@ public partial class Inventory : Node
 		return _slots[index];
 	}
 
-	public ItemData? GetSelectedItem()
+	public ItemData GetSelectedItem()
 	{
 		return SelectedSlotIndex >= 0 ? _slots[SelectedSlotIndex] : null;
 	}
@@ -37,7 +37,7 @@ public partial class Inventory : Node
 		if (item == null)
 			return false;
 
-		for (int i = 0; i < _slots.Length; i++)
+		for (var i = 0; i < _slots.Length; i++)
 		{
 			if (_slots[i] == null)
 			{
@@ -61,7 +61,10 @@ public partial class Inventory : Node
 			return false;
 
 		if (SelectedSlotIndex == index)
+		{
+			ClearSelection();
 			return true;
+		}
 
 		SelectedSlotIndex = index;
 		SelectionChanged?.Invoke(index, _slots[index]);

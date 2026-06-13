@@ -18,9 +18,9 @@ theme_override_styles/panel = SubResource("StyleBoxEmpty_ks3ap")
 [node name="BottomBar" type="PanelContainer" parent="Panel" unique_id=244789361]
 layout_mode = 0
 offset_left = 60.0
-offset_top = 622.0
+offset_top = 582.0
 offset_right = 1182.0
-offset_bottom = 715.0
+offset_bottom = 675.0
 
 [node name="MarginContainer" type="MarginContainer" parent="Panel/BottomBar" unique_id=2020451901]
 layout_mode = 2

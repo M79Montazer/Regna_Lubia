@@ -2,7 +2,7 @@ using Godot;
 
 public partial class PickupItem : Area2D, IInteractable
 {
-	[Export] public ItemData? Item { get; set; }
+	[Export] public ItemData Item { get; set; }
 
 	public string GetPromptText(PlayerController player)
 	{

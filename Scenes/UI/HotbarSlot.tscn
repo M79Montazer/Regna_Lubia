@@ -4,8 +4,9 @@
 [ext_resource type="Texture2D" uid="uid://x808y5vha4se" path="res://Art/icon.svg" id="1_otpte"]
 
 [node name="HotbarSlot" type="Button" unique_id=352473301]
-offset_right = 64.0
-offset_bottom = 64.0
+offset_right = 136.0
+offset_bottom = 136.0
+scale = Vector2(0.8, 0.8)
 icon = ExtResource("1_otpte")
 flat = true
 script = ExtResource("1_5iaem")

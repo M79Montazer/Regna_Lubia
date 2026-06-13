@@ -43,7 +43,7 @@ public partial class Projectile : Area2D
 			return;
 		}
 
-		if (body is StaticBody2D || body is TileMap || body is TileMapLayer)
+		if (body is StaticBody2D or TileMap || body is TileMapLayer)
 			QueueFree();
 	}
 
