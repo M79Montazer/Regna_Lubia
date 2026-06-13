@@ -1,0 +1,931 @@
+===== PROJECT STRUCTURE =====
+
+Regna.Lubia/
+  Scripts/
+    Combat/
+      PlayerCombat.cs
+      Projectile.cs
+    Core/
+      Health.cs
+      Inventory.cs
+      RoomManager.cs
+      Interface/
+        IInteractable.cs
+    Items/
+      ItemData.cs
+    Player/
+      InteractionDetector.cs
+      PlayerController.cs
+    Props/
+      PickupItem.cs
+      RoomTransition.cs
+    UI/
+      HotbarSlot.cs
+      Hud.cs
+    World/
+      Enemy.cs
+      Main.cs
+
+
+================================================================================
+FILE: Scripts\Combat\PlayerCombat.cs
+================================================================================
+
+using Godot;
+
+public partial class PlayerCombat : Node2D
+{
+	[Export] public int MeleeDamage { get; set; } = 25;
+	[Export] public float MeleeActiveTime { get; set; } = 0.08f;
+	[Export] public float ProjectileSpawnOffset { get; set; } = 24f;
+	[Export] public float ProjectileCooldown { get; set; } = 0.35f;
+	[Export] public PackedScene ProjectileScene { get; set; } = null!;
+
+	private PlayerController _player = null!;
+	private Area2D _meleeHitbox = null!;
+	private CollisionShape2D _meleeShape = null!;
+	private Timer _meleeCooldownTimer = null!;
+	private Timer _rangedCooldownTimer = null!;
+
+	private bool _facingRight = true;
+	private bool _meleeActive = false;
+
+	public override void _Ready()
+	{
+		_player = GetParent<PlayerController>();
+
+		_meleeHitbox = GetNode<Area2D>("MeleeHitbox");
+		_meleeShape = _meleeHitbox.GetNode<CollisionShape2D>("CollisionShape2D");
+		_meleeCooldownTimer = GetNode<Timer>("MeleeCooldownTimer");
+		_rangedCooldownTimer = GetNode<Timer>("RangedCooldownTimer");
+
+		_meleeHitbox.BodyEntered += OnMeleeBodyEntered;
+		_meleeShape.Disabled = true;
+
+		SetFacingRight(true);
+	}
+
+	public void SetFacingRight(bool facingRight)
+	{
+		_facingRight = facingRight;
+
+		var pos = _meleeHitbox.Position;
+		pos.X = Mathf.Abs(pos.X) * (_facingRight ? 1 : -1);
+		_meleeHitbox.Position = pos;
+	}
+
+	public void TryMeleeAttack()
+	{
+		if (!_meleeCooldownTimer.IsStopped())
+			return;
+
+		_meleeCooldownTimer.Start(0.25);
+		ActivateMeleeHitbox();
+	}
+
+	public void TryRangedAttack()
+	{
+		if (!_rangedCooldownTimer.IsStopped())
+			return;
+
+		if (ProjectileScene == null)
+			return;
+
+		_rangedCooldownTimer.Start(ProjectileCooldown);
+
+		var projectile = ProjectileScene.Instantiate<Projectile>();
+		projectile.GlobalPosition = _player.GlobalPosition + new Vector2(_facingRight ? ProjectileSpawnOffset : -ProjectileSpawnOffset, -4f);
+		projectile.SetDirection(_facingRight ? Vector2.Right : Vector2.Left);
+
+		GetTree().CurrentScene.AddChild(projectile);
+	}
+
+	private async void ActivateMeleeHitbox()
+	{
+		_meleeActive = true;
+		_meleeShape.Disabled = false;
+
+		await ToSignal(GetTree().CreateTimer(MeleeActiveTime), SceneTreeTimer.SignalName.Timeout);
+
+		_meleeShape.Disabled = true;
+		_meleeActive = false;
+	}
+
+	private void OnMeleeBodyEntered(Node2D body)
+	{
+		if (!_meleeActive)
+			return;
+
+		var health = body.GetNodeOrNull<Health>("Health");
+		health?.Damage(MeleeDamage);
+	}
+}
+
+
+================================================================================
+FILE: Scripts\Combat\Projectile.cs
+================================================================================
+
+using Godot;
+
+public partial class Projectile : Area2D
+{
+	[Export] public float Speed { get; set; } = 700f;
+	[Export] public int Damage { get; set; } = 15;
+	[Export] public float LifeSeconds { get; set; } = 2f;
+
+	private Vector2 _direction = Vector2.Right;
+
+	public override void _Ready()
+	{
+		BodyEntered += OnBodyEntered;
+		AreaEntered += OnAreaEntered;
+
+		Lifetime();
+	}
+
+	public void SetDirection(Vector2 direction)
+	{
+		_direction = direction.Normalized();
+		Rotation = _direction.Angle();
+	}
+
+	public override void _PhysicsProcess(double delta)
+	{
+		GlobalPosition += _direction * Speed * (float)delta;
+	}
+
+	private async void Lifetime()
+	{
+		await ToSignal(GetTree().CreateTimer(LifeSeconds), SceneTreeTimer.SignalName.Timeout);
+		QueueFree();
+	}
+
+	private void OnBodyEntered(Node2D body)
+	{
+		var health = body.GetNodeOrNull<Health>("Health");
+		if (health != null)
+		{
+			health.Damage(Damage);
+			QueueFree();
+			return;
+		}
+
+		if (body is StaticBody2D or TileMap || body is TileMapLayer)
+			QueueFree();
+	}
+
+	private void OnAreaEntered(Area2D area)
+	{
+		var health = area.GetNodeOrNull<Health>("Health");
+		if (health != null)
+		{
+			health.Damage(Damage);
+			QueueFree();
+		}
+	}
+}
+
+
+================================================================================
+FILE: Scripts\Core\Health.cs
+================================================================================
+
+using System;
+using Godot;
+
+public partial class Health : Node
+{
+	[Export] public int MaxHealth { get; set; } = 100;
+
+	public int CurrentHealth { get; private set; }
+
+	public event Action<int, int>? Changed;
+	public event Action? Died;
+
+	public override void _Ready()
+	{
+		CurrentHealth = MaxHealth;
+		Changed?.Invoke(CurrentHealth, MaxHealth);
+	}
+
+	public void Damage(int amount)
+	{
+		if (amount <= 0 || CurrentHealth <= 0)
+			return;
+
+		CurrentHealth = Mathf.Max(CurrentHealth - amount, 0);
+		Changed?.Invoke(CurrentHealth, MaxHealth);
+
+		if (CurrentHealth == 0)
+			Died?.Invoke();
+	}
+
+	public void Heal(int amount)
+	{
+		if (amount <= 0 || CurrentHealth <= 0)
+			return;
+
+		CurrentHealth = Mathf.Min(CurrentHealth + amount, MaxHealth);
+		Changed?.Invoke(CurrentHealth, MaxHealth);
+	}
+}
+
+
+================================================================================
+FILE: Scripts\Core\Interface\IInteractable.cs
+================================================================================
+
+public interface IInteractable
+{
+    string GetPromptText(PlayerController player);
+    bool CanInteract(PlayerController player);
+    void Interact(PlayerController player);
+}
+
+================================================================================
+FILE: Scripts\Core\Inventory.cs
+================================================================================
+
+using System;
+using Godot;
+
+public partial class Inventory : Node
+{
+	[Export] public int SlotCount { get; set; } = 8;
+
+	private ItemData[] _slots = [];
+	public int SelectedSlotIndex { get; private set; } = -1;
+
+	public event Action? InventoryChanged;
+	public event Action<int, ItemData> SelectionChanged;
+
+	public override void _Ready()
+	{
+		if (SlotCount < 1)
+			SlotCount = 8;
+
+		_slots = new ItemData?[SlotCount];
+	}
+
+	public ItemData GetSlot(int index)
+	{
+		if (index < 0 || index >= _slots.Length)
+			return null;
+
+		return _slots[index];
+	}
+
+	public ItemData GetSelectedItem()
+	{
+		return SelectedSlotIndex >= 0 ? _slots[SelectedSlotIndex] : null;
+	}
+
+	public bool AddItem(ItemData item)
+	{
+		if (item == null)
+			return false;
+
+		for (var i = 0; i < _slots.Length; i++)
+		{
+			if (_slots[i] == null)
+			{
+				_slots[i] = item;
+				InventoryChanged?.Invoke();
+				return true;
+			}
+		}
+
+		GD.Print("Inventory full.");
+		return false;
+	}
+
+	public bool SelectSlot(int index)
+	{
+		GD.Print("pressed");
+		if (index < 0 || index >= _slots.Length)
+			return false;
+
+		if (_slots[index] == null)
+			return false;
+
+		if (SelectedSlotIndex == index)
+			return true;
+
+		SelectedSlotIndex = index;
+		SelectionChanged?.Invoke(index, _slots[index]);
+		return true;
+	}
+
+	public void ClearSelection()
+	{
+		if (SelectedSlotIndex == -1)
+			return;
+
+		SelectedSlotIndex = -1;
+		SelectionChanged?.Invoke(-1, null);
+	}
+
+	public bool HasSelectedKey(string requiredKeyId)
+	{
+		var item = GetSelectedItem();
+		return item != null
+			   && item.Type == ItemType.Key
+			   && item.KeyId == requiredKeyId;
+	}
+}
+
+
+================================================================================
+FILE: Scripts\Core\RoomManager.cs
+================================================================================
+
+using System;
+using System.Linq;
+using Godot;
+using Godot.Collections;
+
+public partial class RoomManager : Node
+{
+	[Export] public NodePath RoomContainerPath { get; set; }
+	[Export] public NodePath PlayerPath { get; set; }
+
+	[Export] public string InitialRoomScene = "Bedroom";
+
+	[Export] public string InitialSpawnPath = "Spawns/Spawn_Start";
+
+	private Node2D _roomContainer = null!;
+	private PlayerController _player = null!;
+	private Node2D _currentRoom;
+
+	public static Dictionary<string, string> RoomMap = new()
+	{
+		{"Bedroom","res://Scenes/World/bedroom.tscn"},
+		{"Hallway","res://Scenes/World/hallway.tscn"},
+		{"Balcony","res://Scenes/World/balcony.tscn"},
+
+	};
+
+
+	public override void _Ready()
+	{
+		AddToGroup("room_manager");
+
+		_roomContainer = GetNode<Node2D>(RoomContainerPath);
+		_player = GetNode<PlayerController>(PlayerPath);
+
+		if (InitialRoomScene != null)
+		{
+			LoadRoom(GetSceneFromId(InitialRoomScene), InitialSpawnPath);
+		}
+	}
+
+	public void LoadRoom(PackedScene roomScene, NodePath spawnMarkerPath)
+	{
+		if (roomScene == null)
+			return;
+
+		if (_currentRoom != null)
+		{
+			_currentRoom.QueueFree();
+			_currentRoom = null;
+		}
+
+		_currentRoom = roomScene.Instantiate<Node2D>();
+		_roomContainer.AddChild(_currentRoom);
+
+		var spawn = _currentRoom.GetNodeOrNull<Marker2D>(spawnMarkerPath);
+		if (spawn != null)
+		{
+			_player.TeleportTo(spawn.GlobalPosition);
+		}
+		else
+		{
+			GD.PushWarning($"Spawn marker '{spawnMarkerPath}' not found in room '{roomScene.ResourcePath}'.");
+		}
+	}
+
+	public static PackedScene GetSceneFromId(string id)
+	{
+		try
+		{
+			var location = RoomMap.First(a =>string.Equals(a.Key, id)).Value;
+			var roomScene = ResourceLoader.Load<PackedScene>(location);
+			if (roomScene == null)
+				throw new Exception();
+			return roomScene;
+		}
+		catch (Exception e)
+		{
+			GD.PushError(e);
+			return null;
+		}
+	}
+}
+
+
+================================================================================
+FILE: Scripts\Items\ItemData.cs
+================================================================================
+
+using Godot;
+
+public enum ItemType
+{
+    Key,
+    Readable
+}
+
+[GlobalClass]
+public partial class ItemData : Resource
+{
+    [Export] public string ItemId { get; set; } = "";
+    [Export] public string DisplayName { get; set; } = "";
+    [Export] public ItemType Type { get; set; } = ItemType.Key;
+    [Export] public Texture2D Icon { get; set; }
+
+    [Export] public string KeyId { get; set; } = "";
+
+    [Export(PropertyHint.MultilineText)]
+    public string ReadableText { get; set; } = "";
+}
+
+================================================================================
+FILE: Scripts\Player\InteractionDetector.cs
+================================================================================
+
+using System;
+using Godot;
+
+public partial class InteractionDetector : Area2D
+{
+	public IInteractable? CurrentInteractable { get; private set; }
+
+	public event Action<IInteractable?>? TargetChanged;
+
+	public override void _Ready()
+	{
+		Monitoring = true;
+		Monitorable = true;
+	}
+
+	public override void _PhysicsProcess(double delta)
+	{
+		var current = FindBestInteractable();
+
+		if (!ReferenceEquals(current, CurrentInteractable))
+		{
+			CurrentInteractable = current;
+			TargetChanged?.Invoke(CurrentInteractable);
+		}
+	}
+
+	public void TryInteract(PlayerController player)
+	{
+		CurrentInteractable?.Interact(player);
+	}
+
+	private IInteractable? FindBestInteractable()
+	{
+		var player = GetParent<PlayerController>();
+
+		foreach (var area in GetOverlappingAreas())
+		{
+			if (area is IInteractable interactable && interactable.CanInteract(player))
+				return interactable;
+		}
+
+		return null;
+	}
+}
+
+
+================================================================================
+FILE: Scripts\Player\PlayerController.cs
+================================================================================
+
+using Godot;
+
+public partial class PlayerController : CharacterBody2D
+{
+	[Export] public float MoveSpeed { get; set; } = 220f;
+	[Export] public float Gravity { get; set; } = 1400f;
+
+	public Inventory Inventory { get; private set; } = null!;
+	public Health Health { get; private set; } = null!;
+	public PlayerCombat Combat { get; private set; } = null!;
+	public InteractionDetector InteractionDetector { get; private set; } = null!;
+
+	private Sprite2D _sprite = null!;
+	public bool FacingRight { get; private set; } = true;
+
+	public override void _Ready()
+	{
+		AddToGroup("player");
+
+		_sprite = GetNode<Sprite2D>("Sprite2D");
+		Inventory = GetNode<Inventory>("Inventory");
+		Health = GetNode<Health>("Health");
+		Combat = GetNode<PlayerCombat>("Combat");
+		InteractionDetector = GetNode<InteractionDetector>("InteractionDetector");
+
+		Health.Died += OnDied;
+		Combat.SetFacingRight(true);
+	}
+
+	public override void _PhysicsProcess(double delta)
+	{
+		if (Health.CurrentHealth <= 0)
+			return;
+
+		float moveInput = Input.GetAxis("move_left", "move_right");
+
+		if (Mathf.Abs(moveInput) > 0.01f)
+		{
+			Velocity = new Vector2(moveInput * MoveSpeed, Velocity.Y);
+			SetFacing(moveInput > 0);
+		}
+		else
+		{
+			Velocity = new Vector2(Mathf.MoveToward(Velocity.X, 0, MoveSpeed * 6f * (float)delta), Velocity.Y);
+		}
+
+		if (!IsOnFloor())
+			Velocity = new Vector2(Velocity.X, Velocity.Y + Gravity * (float)delta);
+		else if (Velocity.Y > 0)
+			Velocity = new Vector2(Velocity.X, 0);
+
+		MoveAndSlide();
+
+		if (Input.IsActionJustPressed("interact"))
+			InteractionDetector.TryInteract(this);
+
+		if (Input.IsActionJustPressed("attack_melee"))
+			Combat.TryMeleeAttack();
+
+		if (Input.IsActionJustPressed("attack_ranged"))
+			Combat.TryRangedAttack();
+	}
+
+	private void SetFacing(bool facingRight)
+	{
+		FacingRight = facingRight;
+		_sprite.FlipH = !facingRight;
+		Combat.SetFacingRight(facingRight);
+	}
+
+	public void TeleportTo(Vector2 worldPosition)
+	{
+		GlobalPosition = worldPosition;
+		Velocity = Vector2.Zero;
+	}
+
+	private void OnDied()
+	{
+		GD.Print("Player died");
+		SetPhysicsProcess(false);
+	}
+}
+
+
+================================================================================
+FILE: Scripts\Props\PickupItem.cs
+================================================================================
+
+using Godot;
+
+public partial class PickupItem : Area2D, IInteractable
+{
+	[Export] public ItemData Item { get; set; }
+
+	public string GetPromptText(PlayerController player)
+	{
+		return Item == null ? "Pick up item" : $"Pick up {Item.DisplayName}";
+	}
+
+	public bool CanInteract(PlayerController player)
+	{
+		return Item != null;
+	}
+
+	public void Interact(PlayerController player)
+	{
+		if (Item == null)
+			return;
+
+		if (player.Inventory.AddItem(Item))
+			QueueFree();
+	}
+}
+
+
+================================================================================
+FILE: Scripts\Props\RoomTransition.cs
+================================================================================
+
+using Godot;
+
+public partial class RoomTransition : Area2D, IInteractable
+{
+	[Export] public string LabelText { get; set; } = "Door";
+
+	[Export] public string TargetRoomScene = "Bedroom";
+
+	[Export] public string TargetSpawnPath = "Spawns/Spawn_From_Door_01";
+
+	[Export] public bool StartsLocked { get; set; } = false;
+	[Export] public string RequiredKeyId { get; set; } = "";
+
+	private bool _locked;
+
+	public override void _Ready()
+	{
+		_locked = StartsLocked;
+	}
+
+	public string GetPromptText(PlayerController player)
+	{
+		if (!_locked)
+			return $"Use {LabelText}";
+
+		if (!string.IsNullOrWhiteSpace(RequiredKeyId) && player.Inventory.HasSelectedKey(RequiredKeyId))
+			return $"Unlock {LabelText}";
+
+		return $"{LabelText} (locked)";
+	}
+
+	public bool CanInteract(PlayerController player)
+	{
+		return true;
+	}
+
+	public void Interact(PlayerController player)
+	{
+		if (_locked)
+		{
+			if (!player.Inventory.HasSelectedKey(RequiredKeyId))
+			{
+				GD.Print("door is locked");
+				return;
+			}
+
+			_locked = false;
+			GD.Print("player used " + RequiredKeyId + " to open the lock");
+		}
+
+		if (TargetRoomScene == null)
+			return;
+
+		var roomManager = GetTree().GetFirstNodeInGroup("room_manager") as RoomManager;
+		roomManager?.LoadRoom(RoomManager.GetSceneFromId(TargetRoomScene), TargetSpawnPath);
+	}
+}
+
+
+================================================================================
+FILE: Scripts\UI\HotbarSlot.cs
+================================================================================
+
+using Godot;
+
+public partial class HotbarSlot : Button
+{
+	[Export] public int SlotIndex { get; set; }
+
+	private TextureRect _icon = null!;
+
+	public override void _Ready()
+	{
+		FocusMode = FocusModeEnum.None;
+		_icon = GetNode<TextureRect>("Icon");
+	}
+
+	public void SetItem(ItemData? item, bool selected)
+	{
+		_icon.Texture = item?.Icon;
+		TooltipText = item?.DisplayName ?? "";
+		Disabled = item == null;
+
+		Modulate = selected
+			? new Color(1.2f, 1.2f, 1.2f, 1f)
+			: Colors.White;
+	}
+}
+
+
+================================================================================
+FILE: Scripts\UI\Hud.cs
+================================================================================
+
+using Godot;
+
+public partial class Hud : CanvasLayer
+{
+	[Export] public NodePath PlayerPath { get; set; }
+	[Export] public PackedScene? HotbarSlotScene { get; set; }
+
+	private PlayerController _player = null!;
+
+	private HBoxContainer _hotbarSlots = null!;
+	private Label _promptLabel = null!;
+	private Label _healthLabel = null!;
+	private PanelContainer _readablePanel = null!;
+	private Label _readableTitle = null!;
+	private RichTextLabel _readableText = null!;
+
+	private HotbarSlot[] _slots;
+
+	public override void _Ready()
+	{
+		_player = GetNode<PlayerController>(PlayerPath);
+
+		_hotbarSlots = GetNode<HBoxContainer>("Panel/BottomBar/MarginContainer/HotbarSlots");
+		_promptLabel = GetNode<Label>("Panel/MarginContainer/VBoxContainer/PromptLabel");
+		_healthLabel = GetNode<Label>("Panel/MarginContainer/VBoxContainer/HealthLabel");
+		_readablePanel = GetNode<PanelContainer>("ReadablePanel");
+		_readableTitle = GetNode<Label>("ReadablePanel/MarginContainer/VBoxContainer/TitleLabel");
+		_readableText = GetNode<RichTextLabel>("ReadablePanel/MarginContainer/VBoxContainer/TextLabel");
+
+		BuildHotbar();
+
+		_player.Health.Changed += OnHealthChanged;
+		_player.Inventory.InventoryChanged += RefreshHotbar;
+		_player.Inventory.SelectionChanged += OnSelectionChanged;
+		_player.InteractionDetector.TargetChanged += _ => UpdatePrompt();
+
+		OnHealthChanged(_player.Health.CurrentHealth, _player.Health.MaxHealth);
+		RefreshHotbar();
+		UpdateReadablePanel(_player.Inventory.GetSelectedItem());
+		UpdatePrompt();
+	}
+
+	private void BuildHotbar()
+	{
+		if (HotbarSlotScene == null)
+		{
+			GD.PushError("HotbarSlotScene is not assigned on Hud.");
+			return;
+		}
+
+		_slots = new HotbarSlot[_player.Inventory.SlotCount];
+
+		for (var i = 0; i < _player.Inventory.SlotCount; i++)
+		{
+			var slot = HotbarSlotScene.Instantiate<HotbarSlot>();
+			slot.SlotIndex = i;
+
+			var capturedIndex = i;
+			slot.Pressed += () => _player.Inventory.SelectSlot(capturedIndex);
+
+			_hotbarSlots.AddChild(slot);
+			_slots[i] = slot;
+		}
+	}
+
+	private void RefreshHotbar()
+	{
+		for (var i = 0; i < _slots.Length; i++)
+		{
+			var item = _player.Inventory.GetSlot(i);
+			var selected = _player.Inventory.SelectedSlotIndex == i;
+			_slots[i].SetItem(item, selected);
+		}
+	}
+
+	private void OnSelectionChanged(int index, ItemData? item)
+	{
+		RefreshHotbar();
+		UpdateReadablePanel(item);
+		UpdatePrompt();
+	}
+
+	private void UpdateReadablePanel(ItemData? item)
+	{
+		if (item is { Type: ItemType.Readable })
+		{
+			_readableTitle.Text = item.DisplayName;
+			_readableText.Text = item.ReadableText;
+			_readablePanel.Visible = true;
+		}
+		else
+		{
+			_readablePanel.Visible = false;
+		}
+	}
+
+	private void OnHealthChanged(int current, int max)
+	{
+		_healthLabel.Text = $"HP: {current}/{max}";
+	}
+
+	private void UpdatePrompt()
+	{
+		var target = _player.InteractionDetector.CurrentInteractable;
+		_promptLabel.Text = target == null ? "" : $"E - {target.GetPromptText(_player)}";
+	}
+}
+
+
+================================================================================
+FILE: Scripts\World\Enemy.cs
+================================================================================
+
+using Godot;
+
+public partial class Enemy : CharacterBody2D
+{
+	[Export] public float MoveSpeed { get; set; } = 120f;
+	[Export] public float Gravity { get; set; } = 1400f;
+	[Export] public float AttackRange { get; set; } = 28f;
+	[Export] public float SightRange { get; set; } = 360f;
+	[Export] public float AttackCooldown { get; set; } = 1.2f;
+	[Export] public int ContactDamage { get; set; } = 10;
+
+	private PlayerController? _player;
+	private Health _health = null!;
+	private Timer _attackTimer = null!;
+
+	public override void _Ready()
+	{
+		AddToGroup("enemies");
+
+		_health = GetNode<Health>("Health");
+		_attackTimer = GetNode<Timer>("AttackTimer");
+
+		_health.Died += OnDied;
+	}
+
+	public override void _PhysicsProcess(double delta)
+	{
+		if (_health.CurrentHealth <= 0)
+			return;
+
+		_player ??= GetTree().GetFirstNodeInGroup("player") as PlayerController;
+		if (_player == null)
+			return;
+
+		float dx = _player.GlobalPosition.X - GlobalPosition.X;
+		float absDx = Mathf.Abs(dx);
+
+		if (absDx <= SightRange)
+		{
+			if (absDx > AttackRange)
+			{
+				Velocity = new Vector2(Mathf.Sign(dx) * MoveSpeed, Velocity.Y);
+			}
+			else
+			{
+				Velocity = new Vector2(0, Velocity.Y);
+				TryAttack();
+			}
+		}
+		else
+		{
+			Velocity = new Vector2(0, Velocity.Y);
+		}
+
+		if (!IsOnFloor())
+			Velocity = new Vector2(Velocity.X, Velocity.Y + Gravity * (float)delta);
+		else if (Velocity.Y > 0)
+			Velocity = new Vector2(Velocity.X, 0);
+
+		MoveAndSlide();
+	}
+
+	private void TryAttack()
+	{
+		if (!_attackTimer.IsStopped())
+			return;
+
+		_attackTimer.Start(AttackCooldown);
+
+		var playerHealth = _player?.GetNodeOrNull<Health>("Health");
+		playerHealth?.Damage(ContactDamage);
+	}
+
+	private void OnDied()
+	{
+		QueueFree();
+	}
+}
+
+
+================================================================================
+FILE: Scripts\World\Main.cs
+================================================================================
+
+using Godot;
+
+public partial class Main : Node2D
+{
+    [Export] public NodePath PlayerPath { get; set; }
+    [Export] public NodePath SpawnPath { get; set; }
+
+    public override void _Ready()
+    {
+        var player = GetNode<PlayerController>(PlayerPath);
+        var spawn = GetNode<Marker2D>(SpawnPath);
+
+        player.GlobalPosition = spawn.GlobalPosition;
+    }
+}
