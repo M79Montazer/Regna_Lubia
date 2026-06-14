@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://mj1y72nqcf51"]
 
 [ext_resource type="Script" uid="uid://ddirl5g4yqyfc" path="res://Scripts/UI/Hud.cs" id="1_ks3ap"]
+[ext_resource type="PackedScene" uid="uid://umq7tefwwfjg" path="res://Scenes/UI/Panels/InteractionPanelContainer.tscn" id="2_6d7lo"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ks3ap"]
 
@@ -42,26 +43,4 @@ layout_mode = 2
 [node name="HealthLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer" unique_id=1073232451]
 layout_mode = 2
 
-[node name="ReadablePanel" type="PanelContainer" parent="." unique_id=254292143]
-visible = false
-offset_left = 463.0
-offset_top = 201.0
-offset_right = 846.0
-offset_bottom = 483.0
-
-[node name="MarginContainer" type="MarginContainer" parent="ReadablePanel" unique_id=290567407]
-layout_mode = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="ReadablePanel/MarginContainer" unique_id=1068009485]
-layout_mode = 2
-
-[node name="TitleLabel" type="Label" parent="ReadablePanel/MarginContainer/VBoxContainer" unique_id=1980558110]
-layout_mode = 2
-
-[node name="TextLabel" type="RichTextLabel" parent="ReadablePanel/MarginContainer/VBoxContainer" unique_id=1681111342]
-layout_mode = 2
-text = "hi
-I am"
-fit_content = true
-scroll_following = true
-scroll_following_visible_characters = true
+[node name="InteractionPanelContainer" parent="." unique_id=1306244579 instance=ExtResource("2_6d7lo")]

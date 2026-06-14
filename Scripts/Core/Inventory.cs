@@ -16,7 +16,7 @@ public partial class Inventory : Node
 		if (SlotCount < 1)
 			SlotCount = 8;
 
-		_slots = new ItemData?[SlotCount];
+		_slots = new ItemData[SlotCount];
 	}
 
 	public ItemData GetSlot(int index)
@@ -66,7 +66,10 @@ public partial class Inventory : Node
 			return true;
 		}
 
-		SelectedSlotIndex = index;
+		if (_slots[index].PanelScene == null)
+		{
+			SelectedSlotIndex = index;
+		}
 		SelectionChanged?.Invoke(index, _slots[index]);
 		return true;
 	}
@@ -78,13 +81,5 @@ public partial class Inventory : Node
 
 		SelectedSlotIndex = -1;
 		SelectionChanged?.Invoke(-1, null);
-	}
-
-	public bool HasSelectedKey(string requiredKeyId)
-	{
-		var item = GetSelectedItem();
-		return item != null
-			   && item.Type == ItemType.Key
-			   && item.KeyId == requiredKeyId;
 	}
 }

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ReadableItemData" format=3 uid="uid://d0fvmaglbvx8w"]
+
+[ext_resource type="Script" uid="uid://vrtelb1iensa" path="res://Scripts/Items/ReadableItemData.cs" id="1_muhkt"]
+[ext_resource type="Texture2D" uid="uid://nfjk43868em" path="res://Art/letter.png" id="1_qnpmu"]
+[ext_resource type="PackedScene" uid="uid://dj6x68n1g7oi4" path="res://Scenes/UI/Panels/BookPanel.tscn" id="2_fhur4"]
+
+[resource]
+script = ExtResource("1_muhkt")
+ReadableText = "this is your mom. I am divorcing your father and it is all your fault. go kill yourself. 
+P.S: there is a nice balcony to jump off of"
+ItemId = "letter1"
+DisplayName = "Letter fom your mom"
+Icon = ExtResource("1_qnpmu")
+PanelScene = ExtResource("2_fhur4")
+metadata/_custom_type_script = "uid://vrtelb1iensa"

@@ -3,7 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://bmur10m0fgmd0" path="res://Art/room2_edit2.png" id="1_ynxv8"]
 [ext_resource type="PackedScene" uid="uid://bmednj0jlxh6f" path="res://Scenes/World/room_transition.tscn" id="2_resot"]
 [ext_resource type="PackedScene" uid="uid://cruxm2svouvos" path="res://Scenes/World/pickup_item.tscn" id="3_resot"]
-[ext_resource type="Resource" uid="uid://blp3tglt7nuw5" path="res://Resources/RustyKey.tres" id="4_dsa2c"]
+[ext_resource type="Resource" uid="uid://dudraaafourqv" path="res://Resources/RustyKey.tres" id="4_dsa2c"]
+[ext_resource type="Resource" uid="uid://d0fvmaglbvx8w" path="res://Resources/letter1.tres" id="5_2dagj"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0vupj"]
 size = Vector2(1324, 239)
@@ -55,3 +56,8 @@ TargetRoomScene = "Hallway"
 position = Vector2(161, 76)
 scale = Vector2(0.3, 0.4)
 Item = ExtResource("4_dsa2c")
+
+[node name="PickupItem_note" parent="Props" unique_id=991994477 instance=ExtResource("3_resot")]
+position = Vector2(-347, 79)
+scale = Vector2(0.4, 0.5)
+Item = ExtResource("5_2dagj")

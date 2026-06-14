@@ -10,22 +10,20 @@ public partial class Hud : CanvasLayer
 	private HBoxContainer _hotbarSlots = null!;
 	private Label _promptLabel = null!;
 	private Label _healthLabel = null!;
-	private PanelContainer _readablePanel = null!;
-	private Label _readableTitle = null!;
-	private RichTextLabel _readableText = null!;
+	private InteractionPanelContainer _interactionPanel = null!;
 
 	private HotbarSlot[] _slots;
 
 	public override void _Ready()
 	{
+		AddToGroup("hud");
+
 		_player = GetNode<PlayerController>(PlayerPath);
 
 		_hotbarSlots = GetNode<HBoxContainer>("Panel/BottomBar/MarginContainer/HotbarSlots");
 		_promptLabel = GetNode<Label>("Panel/MarginContainer/VBoxContainer/PromptLabel");
 		_healthLabel = GetNode<Label>("Panel/MarginContainer/VBoxContainer/HealthLabel");
-		_readablePanel = GetNode<PanelContainer>("ReadablePanel");
-		_readableTitle = GetNode<Label>("ReadablePanel/MarginContainer/VBoxContainer/TitleLabel");
-		_readableText = GetNode<RichTextLabel>("ReadablePanel/MarginContainer/VBoxContainer/TextLabel");
+		_interactionPanel = GetNode<InteractionPanelContainer>("InteractionPanelContainer");
 
 		BuildHotbar();
 
@@ -36,8 +34,12 @@ public partial class Hud : CanvasLayer
 
 		OnHealthChanged(_player.Health.CurrentHealth, _player.Health.MaxHealth);
 		RefreshHotbar();
-		UpdateReadablePanel(_player.Inventory.GetSelectedItem());
 		UpdatePrompt();
+	}
+
+	public void OpenInteractionPanel(PackedScene panelScene, ItemData? context)
+	{
+		_interactionPanel.OpenPanel(panelScene, context);
 	}
 
 	private void BuildHotbar()
@@ -76,22 +78,14 @@ public partial class Hud : CanvasLayer
 	private void OnSelectionChanged(int index, ItemData? item)
 	{
 		RefreshHotbar();
-		UpdateReadablePanel(item);
 		UpdatePrompt();
-	}
 
-	private void UpdateReadablePanel(ItemData? item)
-	{
-		if (item is { Type: ItemType.Readable })
+		if (item?.PanelScene != null)
 		{
-			_readableTitle.Text = item.DisplayName;
-			_readableText.Text = item.ReadableText;
-			_readablePanel.Visible = true;
+			OpenInteractionPanel(item.PanelScene, item);
 		}
 		else
-		{
-			_readablePanel.Visible = false;
-		}
+			_interactionPanel.ClosePanel();
 	}
 
 	private void OnHealthChanged(int current, int max)

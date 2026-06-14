@@ -23,7 +23,7 @@ public partial class RoomTransition : Area2D, IInteractable
 		if (!_locked)
 			return $"Use {LabelText}";
 
-		if (!string.IsNullOrWhiteSpace(RequiredKeyId) && player.Inventory.HasSelectedKey(RequiredKeyId))
+		if (!string.IsNullOrWhiteSpace(RequiredKeyId) && HasMatchingKey(player))
 			return $"Unlock {LabelText}";
 
 		return $"{LabelText} (locked)";
@@ -38,7 +38,7 @@ public partial class RoomTransition : Area2D, IInteractable
 	{
 		if (_locked)
 		{
-			if (!player.Inventory.HasSelectedKey(RequiredKeyId))
+			if (!HasMatchingKey(player))
 			{
 				GD.Print("door is locked");
 				return;
@@ -53,5 +53,10 @@ public partial class RoomTransition : Area2D, IInteractable
 
 		var roomManager = GetTree().GetFirstNodeInGroup("room_manager") as RoomManager;
 		roomManager?.LoadRoom(RoomManager.GetSceneFromId(TargetRoomScene), TargetSpawnPath);
+	}
+
+	private bool HasMatchingKey(PlayerController player)
+	{
+		return player.Inventory.GetSelectedItem() is KeyItemData key && key.KeyId == RequiredKeyId;
 	}
 }

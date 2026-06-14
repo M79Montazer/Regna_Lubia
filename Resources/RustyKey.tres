@@ -1,12 +1,11 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://blp3tglt7nuw5"]
+[gd_resource type="Resource" script_class="KeyItemData" format=3 uid="uid://dudraaafourqv"]
 
-[ext_resource type="Texture2D" uid="uid://cgmdwid02010t" path="res://Art/RustyKey.png" id="1_etwe3"]
-[ext_resource type="Script" uid="uid://bbg2s4ongyegi" path="res://Scripts/Items/ItemData.cs" id="1_rr6yy"]
+[ext_resource type="Texture2D" uid="uid://cgmdwid02010t" path="res://Art/RustyKey.png" id="1_7r6xx"]
+[ext_resource type="Script" uid="uid://blrt7c3rabqr2" path="res://Scripts/Items/KeyItemData.cs" id="1_nv3fl"]
 
 [resource]
-script = ExtResource("1_rr6yy")
-ItemId = "RustyKey"
-DisplayName = "Rusty Key"
-Icon = ExtResource("1_etwe3")
+script = ExtResource("1_nv3fl")
 KeyId = "RustyKey"
-metadata/_custom_type_script = "uid://bbg2s4ongyegi"
+ItemId = "Rusty Key"
+Icon = ExtResource("1_7r6xx")
+metadata/_custom_type_script = "uid://blrt7c3rabqr2"
