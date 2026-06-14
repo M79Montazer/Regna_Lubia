@@ -18,8 +18,16 @@ public partial class PickupItem : Area2D, IInteractable
 	{
 		if (Item == null)
 			return;
+		if (Item.CanBePicked)
+		{
+			if (player.Inventory.AddItem(Item))
+				QueueFree();
+		}
+		else if (Item.PanelScene is not null)
+		{
+			var hud = GetTree().GetFirstNodeInGroup("hud") as Hud;
+			hud?.OpenInteractionPanel(Item.PanelScene, Item);
+		}
 
-		if (player.Inventory.AddItem(Item))
-			QueueFree();
 	}
 }

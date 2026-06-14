@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://cruxm2svouvos" path="res://Scenes/World/pickup_item.tscn" id="3_resot"]
 [ext_resource type="Resource" uid="uid://dudraaafourqv" path="res://Resources/RustyKey.tres" id="4_dsa2c"]
 [ext_resource type="Resource" uid="uid://d0fvmaglbvx8w" path="res://Resources/letter1.tres" id="5_2dagj"]
+[ext_resource type="Resource" uid="uid://c12prbnqak3tw" path="res://Resources/lock1.tres" id="6_ubn2l"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0vupj"]
 size = Vector2(1324, 239)
@@ -61,3 +62,8 @@ Item = ExtResource("4_dsa2c")
 position = Vector2(-347, 79)
 scale = Vector2(0.4, 0.5)
 Item = ExtResource("5_2dagj")
+
+[node name="PickupItem_lock" parent="Props" unique_id=1252917011 instance=ExtResource("3_resot")]
+position = Vector2(-737, 132)
+scale = Vector2(0.4, 0.3)
+Item = ExtResource("6_ubn2l")

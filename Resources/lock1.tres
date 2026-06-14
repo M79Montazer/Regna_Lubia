@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CombinationLockItemData" format=3 uid="uid://c12prbnqak3tw"]
+
+[ext_resource type="Script" uid="uid://dv1pqb150ln3b" path="res://Scripts/Items/CombinationLockItemData.cs" id="1_bsai8"]
+[ext_resource type="PackedScene" uid="uid://b0n582rmf4eu7" path="res://Scenes/UI/Panels/CombinationLockPanel.tscn" id="1_mkccs"]
+
+[resource]
+script = ExtResource("1_bsai8")
+CorrectCode = "2010"
+LockId = "lock1"
+ItemId = "lock1"
+DisplayName = "lock"
+PanelScene = ExtResource("1_mkccs")
+metadata/_custom_type_script = "uid://dv1pqb150ln3b"

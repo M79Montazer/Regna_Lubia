@@ -8,4 +8,5 @@ script = ExtResource("1_nv3fl")
 KeyId = "RustyKey"
 ItemId = "Rusty Key"
 Icon = ExtResource("1_7r6xx")
+CanBePicked = true
 metadata/_custom_type_script = "uid://blrt7c3rabqr2"

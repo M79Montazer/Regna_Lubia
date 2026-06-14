@@ -3,7 +3,7 @@ using Godot;
 
 public partial class CombinationLockPanel : PanelContainer, IInteractablePanel
 {
-	[Export] public string CorrectCode { get; set; } = "0000";
+	[Export] public string CorrectCode { get; set; }
 
 	private Label[] _digits = new Label[4];
 	private Button _openButton;
@@ -13,7 +13,13 @@ public partial class CombinationLockPanel : PanelContainer, IInteractablePanel
 	public override void _Ready()
 	{
 		for (int i = 0; i < 4; i++)
+		{
 			_digits[i] = GetNode<Label>($"VBoxContainer/HBoxContainer/Digit{i}/Value");
+
+			int captured = i;
+			GetNode<Button>($"VBoxContainer/HBoxContainer/Digit{i}/+").Pressed += () => OnDigitUp(captured);
+			GetNode<Button>($"VBoxContainer/HBoxContainer/Digit{i}/-").Pressed += () => OnDigitDown(captured);
+		}
 
 		_openButton = GetNode<Button>("VBoxContainer/OpenButton");
 		_openButton.Pressed += OnOpenPressed;
@@ -59,6 +65,7 @@ public partial class CombinationLockPanel : PanelContainer, IInteractablePanel
 		}
 		else
 		{
+			GD.Print(entered + ":" + CorrectCode);
 			GD.Print("Wrong combination.");
 		}
 
