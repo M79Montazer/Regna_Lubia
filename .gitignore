@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 .Godot/
+/AGENTS.md
+/TODO.txt

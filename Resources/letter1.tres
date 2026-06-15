@@ -12,4 +12,5 @@ ItemId = "letter1"
 DisplayName = "Letter fom your mom"
 Icon = ExtResource("1_qnpmu")
 PanelScene = ExtResource("2_fhur4")
+CanBePicked = true
 metadata/_custom_type_script = "uid://vrtelb1iensa"

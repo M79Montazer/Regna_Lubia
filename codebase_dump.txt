@@ -12,7 +12,10 @@ Regna.Lubia/
       Interface/
         IInteractable.cs
     Items/
+      CombinationLockItemData.cs
       ItemData.cs
+      KeyItemData.cs
+      ReadableItemData.cs
     Player/
       InteractionDetector.cs
       PlayerController.cs
@@ -22,6 +25,11 @@ Regna.Lubia/
     UI/
       HotbarSlot.cs
       Hud.cs
+      InteractionPanelContainer.cs
+      Panels/
+        BookPanel.cs
+        CombinationLockPanel.cs
+        IInteractablePanel.cs
     World/
       Enemy.cs
       Main.cs
@@ -265,7 +273,7 @@ public partial class Inventory : Node
 		if (SlotCount < 1)
 			SlotCount = 8;
 
-		_slots = new ItemData?[SlotCount];
+		_slots = new ItemData[SlotCount];
 	}
 
 	public ItemData GetSlot(int index)
@@ -310,9 +318,15 @@ public partial class Inventory : Node
 			return false;
 
 		if (SelectedSlotIndex == index)
+		{
+			ClearSelection();
 			return true;
+		}
 
-		SelectedSlotIndex = index;
+		if (_slots[index].PanelScene == null)
+		{
+			SelectedSlotIndex = index;
+		}
 		SelectionChanged?.Invoke(index, _slots[index]);
 		return true;
 	}
@@ -324,14 +338,6 @@ public partial class Inventory : Node
 
 		SelectedSlotIndex = -1;
 		SelectionChanged?.Invoke(-1, null);
-	}
-
-	public bool HasSelectedKey(string requiredKeyId)
-	{
-		var item = GetSelectedItem();
-		return item != null
-			   && item.Type == ItemType.Key
-			   && item.KeyId == requiredKeyId;
 	}
 }
 
@@ -425,29 +431,58 @@ public partial class RoomManager : Node
 
 
 ================================================================================
+FILE: Scripts\Items\CombinationLockItemData.cs
+================================================================================
+
+using Godot;
+
+[GlobalClass]
+public partial class CombinationLockItemData : ItemData
+{
+	[Export] public string CorrectCode { get; set; } = "0000";
+	[Export] public string LockId { get; set; } = "";
+}
+
+================================================================================
 FILE: Scripts\Items\ItemData.cs
 ================================================================================
 
 using Godot;
 
-public enum ItemType
-{
-    Key,
-    Readable
-}
-
-[GlobalClass]
 public partial class ItemData : Resource
 {
-    [Export] public string ItemId { get; set; } = "";
-    [Export] public string DisplayName { get; set; } = "";
-    [Export] public ItemType Type { get; set; } = ItemType.Key;
-    [Export] public Texture2D Icon { get; set; }
+	[Export] public string ItemId { get; set; } = "";
+	[Export] public string DisplayName { get; set; } = "";
+	[Export] public Texture2D Icon { get; set; }
 
-    [Export] public string KeyId { get; set; } = "";
+	[Export] public PackedScene PanelScene { get; set; }
+	[Export] public bool CanBePicked { get; set; }
+}
 
-    [Export(PropertyHint.MultilineText)]
-    public string ReadableText { get; set; } = "";
+
+================================================================================
+FILE: Scripts\Items\KeyItemData.cs
+================================================================================
+
+using Godot;
+
+[GlobalClass]
+public partial class KeyItemData : ItemData
+{
+	[Export] public string KeyId { get; set; } = "";
+}
+
+================================================================================
+FILE: Scripts\Items\ReadableItemData.cs
+================================================================================
+
+using Godot;
+
+[GlobalClass]
+public partial class ReadableItemData : ItemData
+{
+	[Export(PropertyHint.MultilineText)]
+	public string ReadableText { get; set; } = "";
 }
 
 ================================================================================
@@ -612,9 +647,17 @@ public partial class PickupItem : Area2D, IInteractable
 	{
 		if (Item == null)
 			return;
+		if (Item.CanBePicked)
+		{
+			if (player.Inventory.AddItem(Item))
+				QueueFree();
+		}
+		else if (Item.PanelScene is not null)
+		{
+			var hud = GetTree().GetFirstNodeInGroup("hud") as Hud;
+			hud?.OpenInteractionPanel(Item.PanelScene, Item);
+		}
 
-		if (player.Inventory.AddItem(Item))
-			QueueFree();
 	}
 }
 
@@ -648,7 +691,7 @@ public partial class RoomTransition : Area2D, IInteractable
 		if (!_locked)
 			return $"Use {LabelText}";
 
-		if (!string.IsNullOrWhiteSpace(RequiredKeyId) && player.Inventory.HasSelectedKey(RequiredKeyId))
+		if (!string.IsNullOrWhiteSpace(RequiredKeyId) && HasMatchingKey(player))
 			return $"Unlock {LabelText}";
 
 		return $"{LabelText} (locked)";
@@ -663,7 +706,7 @@ public partial class RoomTransition : Area2D, IInteractable
 	{
 		if (_locked)
 		{
-			if (!player.Inventory.HasSelectedKey(RequiredKeyId))
+			if (!HasMatchingKey(player))
 			{
 				GD.Print("door is locked");
 				return;
@@ -678,6 +721,11 @@ public partial class RoomTransition : Area2D, IInteractable
 
 		var roomManager = GetTree().GetFirstNodeInGroup("room_manager") as RoomManager;
 		roomManager?.LoadRoom(RoomManager.GetSceneFromId(TargetRoomScene), TargetSpawnPath);
+	}
+
+	private bool HasMatchingKey(PlayerController player)
+	{
+		return player.Inventory.GetSelectedItem() is KeyItemData key && key.KeyId == RequiredKeyId;
 	}
 }
 
@@ -729,22 +777,20 @@ public partial class Hud : CanvasLayer
 	private HBoxContainer _hotbarSlots = null!;
 	private Label _promptLabel = null!;
 	private Label _healthLabel = null!;
-	private PanelContainer _readablePanel = null!;
-	private Label _readableTitle = null!;
-	private RichTextLabel _readableText = null!;
+	private InteractionPanelContainer _interactionPanel = null!;
 
 	private HotbarSlot[] _slots;
 
 	public override void _Ready()
 	{
+		AddToGroup("hud");
+
 		_player = GetNode<PlayerController>(PlayerPath);
 
 		_hotbarSlots = GetNode<HBoxContainer>("Panel/BottomBar/MarginContainer/HotbarSlots");
 		_promptLabel = GetNode<Label>("Panel/MarginContainer/VBoxContainer/PromptLabel");
 		_healthLabel = GetNode<Label>("Panel/MarginContainer/VBoxContainer/HealthLabel");
-		_readablePanel = GetNode<PanelContainer>("ReadablePanel");
-		_readableTitle = GetNode<Label>("ReadablePanel/MarginContainer/VBoxContainer/TitleLabel");
-		_readableText = GetNode<RichTextLabel>("ReadablePanel/MarginContainer/VBoxContainer/TextLabel");
+		_interactionPanel = GetNode<InteractionPanelContainer>("InteractionPanelContainer");
 
 		BuildHotbar();
 
@@ -755,8 +801,12 @@ public partial class Hud : CanvasLayer
 
 		OnHealthChanged(_player.Health.CurrentHealth, _player.Health.MaxHealth);
 		RefreshHotbar();
-		UpdateReadablePanel(_player.Inventory.GetSelectedItem());
 		UpdatePrompt();
+	}
+
+	public void OpenInteractionPanel(PackedScene panelScene, ItemData? context)
+	{
+		_interactionPanel.OpenPanel(panelScene, context);
 	}
 
 	private void BuildHotbar()
@@ -795,22 +845,14 @@ public partial class Hud : CanvasLayer
 	private void OnSelectionChanged(int index, ItemData? item)
 	{
 		RefreshHotbar();
-		UpdateReadablePanel(item);
 		UpdatePrompt();
-	}
 
-	private void UpdateReadablePanel(ItemData? item)
-	{
-		if (item is { Type: ItemType.Readable })
+		if (item?.PanelScene != null)
 		{
-			_readableTitle.Text = item.DisplayName;
-			_readableText.Text = item.ReadableText;
-			_readablePanel.Visible = true;
+			OpenInteractionPanel(item.PanelScene, item);
 		}
 		else
-		{
-			_readablePanel.Visible = false;
-		}
+			_interactionPanel.ClosePanel();
 	}
 
 	private void OnHealthChanged(int current, int max)
@@ -825,6 +867,203 @@ public partial class Hud : CanvasLayer
 	}
 }
 
+
+================================================================================
+FILE: Scripts\UI\InteractionPanelContainer.cs
+================================================================================
+
+using Godot;
+
+public partial class InteractionPanelContainer : Panel
+{
+	private PanelContainer _contentContainer;
+	private IInteractablePanel _activePanel;
+
+	public override void _Ready()
+	{
+		_contentContainer = GetNode<PanelContainer>("ContentContainer");
+		Visible = false;
+		MouseFilter = MouseFilterEnum.Pass;
+	}
+
+	public override void _Input(InputEvent @event)
+	{
+		if (@event.IsActionPressed("ui_cancel") && Visible)
+			ClosePanel();
+	}
+
+	public void OpenPanel(PackedScene panelScene, ItemData? context)
+	{
+		foreach (var child in _contentContainer.GetChildren())
+		{
+			child.QueueFree();
+		}
+
+		var panel = panelScene.Instantiate();
+		_contentContainer.AddChild(panel);
+
+		if (panel is IInteractablePanel interactablePanel)
+		{
+			_activePanel = interactablePanel;
+			_activePanel.Closed += ClosePanel;
+			_activePanel.Open(context);
+		}
+
+		Visible = true;
+	}
+
+	public void ClosePanel()
+	{
+		if (_activePanel != null)
+		{
+			_activePanel.Closed -= ClosePanel;
+			_activePanel.Close();
+			_activePanel = null;
+		}
+
+		foreach (var child in _contentContainer.GetChildren())
+		{
+			child.QueueFree();
+		}
+
+		Visible = false;
+	}
+}
+
+
+================================================================================
+FILE: Scripts\UI\Panels\BookPanel.cs
+================================================================================
+
+using System;
+using Godot;
+
+public partial class BookPanel : PanelContainer, IInteractablePanel
+{
+	private Label _titleLabel;
+	private RichTextLabel _contentLabel;
+	private Button _closeButton;
+
+	public event Action Closed;
+
+	public override void _Ready()
+	{
+		_titleLabel = GetNode<Label>("VBoxContainer/TitleLabel");
+		_contentLabel = GetNode<RichTextLabel>("VBoxContainer/ContentLabel");
+		_closeButton = GetNode<Button>("VBoxContainer/CloseButton");
+
+		_closeButton.Pressed += () => Closed?.Invoke();
+	}
+
+	public void Open(ItemData? context)
+	{
+		_titleLabel.Text = context?.DisplayName ?? "";
+
+		if (context is ReadableItemData readable)
+			_contentLabel.Text = readable.ReadableText;
+		else
+			_contentLabel.Text = "";
+	}
+
+	public void Close()
+	{
+		Closed?.Invoke();
+	}
+}
+
+
+================================================================================
+FILE: Scripts\UI\Panels\CombinationLockPanel.cs
+================================================================================
+
+using System;
+using Godot;
+
+public partial class CombinationLockPanel : PanelContainer, IInteractablePanel
+{
+	[Export] public string CorrectCode { get; set; }
+
+	private Label[] _digits = new Label[4];
+	private Button _openButton;
+
+	public event Action Closed;
+
+	public override void _Ready()
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			_digits[i] = GetNode<Label>($"VBoxContainer/HBoxContainer/Digit{i}/Value");
+
+			int captured = i;
+			GetNode<Button>($"VBoxContainer/HBoxContainer/Digit{i}/+").Pressed += () => OnDigitUp(captured);
+			GetNode<Button>($"VBoxContainer/HBoxContainer/Digit{i}/-").Pressed += () => OnDigitDown(captured);
+		}
+
+		_openButton = GetNode<Button>("VBoxContainer/OpenButton");
+		_openButton.Pressed += OnOpenPressed;
+	}
+
+	public void Open(ItemData? context)
+	{
+		if (context is CombinationLockItemData lockData)
+			CorrectCode = lockData.CorrectCode;
+
+		for (int i = 0; i < 4; i++)
+			_digits[i].Text = "0";
+	}
+
+	public void Close()
+	{
+		Closed?.Invoke();
+	}
+
+	public void OnDigitUp(int index)
+	{
+		var val = int.Parse(_digits[index].Text);
+		val = (val + 1) % 10;
+		_digits[index].Text = val.ToString();
+	}
+
+	public void OnDigitDown(int index)
+	{
+		var val = int.Parse(_digits[index].Text);
+		val = (val + 9) % 10;
+		_digits[index].Text = val.ToString();
+	}
+
+	private void OnOpenPressed()
+	{
+		var entered = "";
+		for (int i = 0; i < 4; i++)
+			entered += _digits[i].Text;
+
+		if (entered == CorrectCode)
+		{
+			GD.Print("Combination correct!");
+		}
+		else
+		{
+			GD.Print(entered + ":" + CorrectCode);
+			GD.Print("Wrong combination.");
+		}
+
+		Closed?.Invoke();
+	}
+}
+
+
+================================================================================
+FILE: Scripts\UI\Panels\IInteractablePanel.cs
+================================================================================
+
+using System;
+
+public interface IInteractablePanel
+{
+	void Open(ItemData? context);
+	void Close();
+	event Action Closed;
+}
 
 ================================================================================
 FILE: Scripts\World\Enemy.cs
