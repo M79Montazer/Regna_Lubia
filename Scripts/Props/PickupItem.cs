@@ -8,6 +8,8 @@ public partial class PickupItem : Area2D, IInteractable
 
 	public override void _Ready()
 	{
+		AddToGroup("pickup_items");
+
 		if (string.IsNullOrEmpty(PersistentId))
 			return;
 

@@ -84,6 +84,15 @@ public partial class CombinationLockPanel : PanelContainer, IInteractablePanel
 			{
 				GD.PushWarning("CombinationLockItemData has no LockId; lock state will not persist.");
 			}
+
+			foreach (var pickup in GetTree().GetNodesInGroup("pickup_items"))
+			{
+				if (pickup is PickupItem pi && pi.Item is CombinationLockItemData lockData && lockData.LockId == _lockId)
+				{
+					GD.Print($"Deleting lock pickup: {pi.Name}");
+					pi.QueueFree();
+				}
+			}
 		}
 		else
 		{
