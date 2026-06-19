@@ -52,18 +52,24 @@ position = Vector2(383, 145)
 position = Vector2(-37, -66)
 scale = Vector2(0.5, 0.5)
 TargetRoomScene = "Hallway"
+StartsLocked = true
+PersistentId = "bedroom_door"
+UnlockFlagKey = "lock.lock1.unlocked"
 
 [node name="PickupItem" parent="Props" unique_id=931302512 instance=ExtResource("3_resot")]
 position = Vector2(161, 76)
 scale = Vector2(0.3, 0.4)
 Item = ExtResource("4_dsa2c")
+PersistentId = "bedroom_rustykey"
 
 [node name="PickupItem_note" parent="Props" unique_id=991994477 instance=ExtResource("3_resot")]
 position = Vector2(-347, 79)
 scale = Vector2(0.4, 0.5)
 Item = ExtResource("5_2dagj")
+PersistentId = "bedroom_note"
 
 [node name="PickupItem_lock" parent="Props" unique_id=1252917011 instance=ExtResource("3_resot")]
 position = Vector2(-737, 132)
 scale = Vector2(0.4, 0.3)
 Item = ExtResource("6_ubn2l")
+PersistentId = "bedroom_comb_lock"

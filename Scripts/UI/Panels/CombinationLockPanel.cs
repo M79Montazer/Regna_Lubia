@@ -7,6 +7,7 @@ public partial class CombinationLockPanel : PanelContainer, IInteractablePanel
 
 	private Label[] _digits = new Label[4];
 	private Button _openButton;
+	private string _lockId = "";
 
 	public event Action Closed;
 
@@ -28,7 +29,14 @@ public partial class CombinationLockPanel : PanelContainer, IInteractablePanel
 	public void Open(ItemData? context)
 	{
 		if (context is CombinationLockItemData lockData)
+		{
 			CorrectCode = lockData.CorrectCode;
+			_lockId = lockData.LockId ?? "";
+		}
+		else
+		{
+			_lockId = "";
+		}
 
 		for (int i = 0; i < 4; i++)
 			_digits[i].Text = "0";
@@ -62,6 +70,20 @@ public partial class CombinationLockPanel : PanelContainer, IInteractablePanel
 		if (entered == CorrectCode)
 		{
 			GD.Print("Combination correct!");
+
+			if (!string.IsNullOrEmpty(_lockId))
+			{
+				var state = GameStateLocator.Find(this);
+				if (state != null)
+				{
+					state.SetFlag($"lock.{_lockId}.unlocked", true);
+					state.SetFlag($"puzzle.{_lockId}.solved", true);
+				}
+			}
+			else
+			{
+				GD.PushWarning("CombinationLockItemData has no LockId; lock state will not persist.");
+			}
 		}
 		else
 		{

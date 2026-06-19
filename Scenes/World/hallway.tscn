@@ -54,3 +54,4 @@ scale = Vector2(0.4, 0.4)
 TargetRoomScene = "Balcony"
 StartsLocked = true
 RequiredKeyId = "RustyKey"
+PersistentId = "hallway_to_balcony_door"
