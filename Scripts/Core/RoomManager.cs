@@ -18,10 +18,9 @@ public partial class RoomManager : Node
 
 	public static Dictionary<string, string> RoomMap = new()
 	{
-		{"Bedroom","res://Scenes/World/bedroom.tscn"},
-		{"Hallway","res://Scenes/World/hallway.tscn"},
-		{"Balcony","res://Scenes/World/balcony.tscn"},
-
+		//{"Bedroom","res://Scenes/World/bedroom.tscn"},
+		//{"Hallway","res://Scenes/World/hallway.tscn"},
+		//{"Balcony","res://Scenes/World/balcony.tscn"},
 	};
 
 
@@ -65,18 +64,22 @@ public partial class RoomManager : Node
 
 	public static PackedScene GetSceneFromId(string id)
 	{
-		try
+		var entry = RoomMap.FirstOrDefault(a => string.Equals(a.Key, id, StringComparison.OrdinalIgnoreCase));
+
+		if (!string.IsNullOrEmpty(entry.Value))
 		{
-			var location = RoomMap.First(a =>string.Equals(a.Key, id)).Value;
-			var roomScene = ResourceLoader.Load<PackedScene>(location);
-			if (roomScene == null)
-				throw new Exception();
-			return roomScene;
+			var roomScene = ResourceLoader.Load<PackedScene>(entry.Value);
+			if (roomScene != null)
+				return roomScene;
 		}
-		catch (Exception e)
-		{
-			GD.PushError(e);
-			return null;
-		}
-	}
+
+		var fallbackLocation = $"res://Scenes/World/{id}.tscn";
+		var fallbackRoomScene = ResourceLoader.Load<PackedScene>(fallbackLocation);
+
+		if (fallbackRoomScene != null)
+			return fallbackRoomScene;
+
+		GD.PushError($"Could not load room scene for id '{id}'.");
+		return null;
+}
 }
