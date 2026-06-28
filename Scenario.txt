@@ -1,0 +1,23 @@
+vertical MVP of Regna.Lubia
+
+
+
+
+
+
+
+prologue: a movie like introduction from art team
+
+
+
+scene1 (bedroom): Lubia is standing in her room. she is tired. she interacts with the bed to sleep
+
+scene2 (workroom): a room with a bed, a locked notebook, a calendar and a display glass. calendar shows the text: today is dd/mm/yy. if interacted with glass, player sees an image showing 4 vinyl music discs and a text that says something. if player interacts with the notebook, a panel should open, it has a text and a 4 digit combination lock. if solved, the notebook is now unlocked. interacting with it would send her to the next room. keep in mind that lock and notebook are not separate objects. first time interacting would open the lock panel, after solving it, interacting with it would send the player to next room. 
+
+scene3 (dream-bedroom): Lubia is standing in the room. her brother enters the room and stands in the other end of the room. lubia can then interact with him. on interact, Brother has a short dialogue with Lubia until he gets unwell and can no longer talk. interacting with him further just shows a dialogue "he is unwell". the dialogue system is a voice (to be implemented later) and a caption. nothing fancy. after this exchange, a gramophone becomes interactable. it has a unique interact able panel. the interactable panel is like a minecraft panel in the sense that there is a slot to put an item in it chosen from your hotbar. in the first time interacting with it, it has a "broken vinyl" in its slot. closing this window will then force the palyer back to the workroom
+
+scene4 (workroom) now the notebook is locked and interacting with the display glass give the player 4 music discs. if player opens one of them (clicking on them in hotbar) a text panel would open showing thee title and a little description of that disc. after getting the discs, you can interact with the notebook again to be send back to the dream
+
+scene5 (dream-bedroom) you can put discs in gramophone. each time the corresponding music would play. but one of them is the "correct" one. playing that music, would make the brother well again. after that interacting with him he has some more dialogues and the door behind him is now unlocked. going through that door, lead to the final room.
+
+final room: a note saying thanks for playing our demo
