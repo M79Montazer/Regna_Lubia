@@ -9,7 +9,6 @@ public partial class InteractionPanelContainer : Panel
 	{
 		_contentContainer = GetNode<PanelContainer>("ContentContainer");
 		Visible = false;
-		MouseFilter = MouseFilterEnum.Pass;
 	}
 
 	public override void _Input(InputEvent @event)

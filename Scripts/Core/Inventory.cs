@@ -82,4 +82,16 @@ public partial class Inventory : Node
 		SelectedSlotIndex = -1;
 		SelectionChanged?.Invoke(-1, null);
 	}
+
+	public void RemoveItemAt(int index)
+	{
+		if (index < 0 || index >= _slots.Length)
+			return;
+
+		if (SelectedSlotIndex == index)
+			SelectedSlotIndex = -1;
+
+		_slots[index] = null;
+		InventoryChanged?.Invoke();
+	}
 }

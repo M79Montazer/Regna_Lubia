@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ReadableItemData" format=3]
+
+[ext_resource type="Script" uid="uid://vrtelb1iensa" path="res://Scripts/Items/ReadableItemData.cs" id="1_cal"]
+[ext_resource type="PackedScene" uid="uid://dj6x68n1g7oi4" path="res://Scenes/UI/Panels/BookPanel.tscn" id="2_cal"]
+
+[resource]
+script = ExtResource("1_cal")
+ItemId = "calendar_text"
+DisplayName = "Calendar"
+ReadableText = "Today is 28/06/2026\n\nThe calendar shows a single date circled in red."
+PanelScene = ExtResource("2_cal")
+CanBePicked = false

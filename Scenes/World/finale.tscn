@@ -1,0 +1,28 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://cruxm2svouvos" path="res://Scenes/World/pickup_item.tscn" id="1_pick"]
+[ext_resource type="Resource" path="res://Resources/finale_note.tres" id="2_note"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(1324, 239)
+
+[node name="Finale" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(0, 476)
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="Spawns" type="Node" parent="."]
+
+[node name="Spawn_Start" type="Marker2D" parent="Spawns"]
+position = Vector2(0, 180)
+
+[node name="Props" type="Node2D" parent="."]
+
+[node name="ThanksNote" parent="Props" instance=ExtResource("1_pick")]
+position = Vector2(0, 180)
+Item = ExtResource("2_note")

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="VinylRecordItemData" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Items/VinylRecordItemData.cs" id="1_rr1"]
+[ext_resource type="Texture2D" path="res://Art/disc_red.svg" id="2_rr2"]
+[ext_resource type="PackedScene" uid="uid://dj6x68n1g7oi4" path="res://Scenes/UI/Panels/BookPanel.tscn" id="3_rr3"]
+
+[resource]
+script = ExtResource("1_rr1")
+DiscId = "disc_red"
+ReadableText = "A crimson disc with a fiery label. The grooves seem to tell a story of passion and longing. The title reads: 'Ember Waltz'"
+ItemId = "vinyl_disc_red"
+DisplayName = "Red Vinyl"
+Icon = ExtResource("2_rr2")
+PanelScene = ExtResource("3_rr3")
+CanBePicked = true

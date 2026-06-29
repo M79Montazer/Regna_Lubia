@@ -1,0 +1,77 @@
+[gd_scene format=3 uid="uid://c1t6o4kc3601m"]
+
+[ext_resource type="Texture2D" uid="uid://wqlhuya4tsja" path="res://Art/work_room.png" id="1_4kxui"]
+[ext_resource type="Script" uid="uid://cwmumbxkfnp00" path="res://Scripts/Props/Notebook.cs" id="2_nb"]
+[ext_resource type="Script" uid="uid://byj70045qf1n6" path="res://Scripts/Props/DisplayGlass.cs" id="4_glass"]
+[ext_resource type="PackedScene" uid="uid://cruxm2svouvos" path="res://Scenes/World/pickup_item.tscn" id="5_pick"]
+[ext_resource type="Resource" path="res://Resources/calendar_text.tres" id="6_cal"]
+[ext_resource type="Resource" path="res://Resources/vinyl_disc_red.tres" id="7_dr"]
+[ext_resource type="Resource" path="res://Resources/vinyl_disc_blue.tres" id="8_db"]
+[ext_resource type="Resource" path="res://Resources/vinyl_disc_green.tres" id="9_dg"]
+[ext_resource type="Resource" path="res://Resources/vinyl_disc_purple.tres" id="10_dp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(1324, 239)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_left"]
+size = Vector2(176, 952)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_right"]
+size = Vector2(303, 799.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_interact"]
+size = Vector2(80, 80)
+
+[node name="Workroom" type="Node2D" unique_id=438276658]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1261245881]
+texture = ExtResource("1_4kxui")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=429228013]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=2110527235]
+position = Vector2(0, 476)
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D" unique_id=297151750]
+position = Vector2(373, 27)
+shape = SubResource("RectangleShape2D_left")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D" unique_id=1478459861]
+position = Vector2(-449, -14)
+shape = SubResource("RectangleShape2D_right")
+
+[node name="Spawns" type="Node" parent="." unique_id=1853382600]
+
+[node name="Spawn_Start" type="Marker2D" parent="Spawns" unique_id=1973838186]
+position = Vector2(-210, 180)
+
+[node name="Props" type="Node2D" parent="." unique_id=1113259491]
+
+[node name="Notebook" type="Area2D" parent="Props" unique_id=835345585]
+position = Vector2(-243, 98)
+scale = Vector2(1, 3)
+script = ExtResource("2_nb")
+CorrectCode = "2010"
+InitialText = "This is a placeholder text."
+
+[node name="NotebookCollision" type="CollisionShape2D" parent="Props/Notebook" unique_id=1140334975]
+position = Vector2(63, 10)
+shape = SubResource("RectangleShape2D_interact")
+debug_color = Color(0.6, 0.4, 0.2, 0.4)
+
+[node name="Calendar" parent="Props" unique_id=2045519997 instance=ExtResource("5_pick")]
+position = Vector2(-57, 120)
+scale = Vector2(0.3, 0.3)
+Item = ExtResource("6_cal")
+
+[node name="DisplayGlass" type="Area2D" parent="Props" unique_id=446101280]
+position = Vector2(300, 250)
+scale = Vector2(2, 3)
+script = ExtResource("4_glass")
+Discs = [ExtResource("7_dr"), ExtResource("8_db"), ExtResource("9_dg"), ExtResource("10_dp")]
+
+[node name="GlassCollision" type="CollisionShape2D" parent="Props/DisplayGlass" unique_id=1028428335]
+position = Vector2(5.25, -12)
+shape = SubResource("RectangleShape2D_interact")
+debug_color = Color(0.8, 0.8, 0.4, 0.4)

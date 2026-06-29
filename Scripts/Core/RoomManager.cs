@@ -8,7 +8,7 @@ public partial class RoomManager : Node
 	[Export] public NodePath RoomContainerPath { get; set; }
 	[Export] public NodePath PlayerPath { get; set; }
 
-	[Export] public string InitialRoomScene = "Bedroom";
+	[Export] public string InitialRoomScene = "prologue_bedroom";
 
 	[Export] public string InitialSpawnPath = "Spawns/Spawn_Start";
 

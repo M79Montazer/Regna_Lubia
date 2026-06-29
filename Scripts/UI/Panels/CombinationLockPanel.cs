@@ -7,12 +7,15 @@ public partial class CombinationLockPanel : PanelContainer, IInteractablePanel
 
 	private Label[] _digits = new Label[4];
 	private Button _openButton;
+	private Label _descriptionLabel;
 	private string _lockId = "";
 
 	public event Action Closed;
 
 	public override void _Ready()
 	{
+		_descriptionLabel = GetNode<Label>("VBoxContainer/DescriptionLabel");
+
 		for (int i = 0; i < 4; i++)
 		{
 			_digits[i] = GetNode<Label>($"VBoxContainer/HBoxContainer/Digit{i}/Value");
@@ -32,6 +35,12 @@ public partial class CombinationLockPanel : PanelContainer, IInteractablePanel
 		{
 			CorrectCode = lockData.CorrectCode;
 			_lockId = lockData.LockId ?? "";
+
+			if (!string.IsNullOrEmpty(lockData.DisplayName) && _descriptionLabel != null)
+				_descriptionLabel.Text = lockData.DisplayName;
+
+			if (_descriptionLabel != null)
+				_descriptionLabel.Visible = !string.IsNullOrEmpty(_descriptionLabel.Text);
 		}
 		else
 		{

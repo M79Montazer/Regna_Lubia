@@ -1,0 +1,91 @@
+[gd_scene format=3 uid="uid://c052ilpncpkvm"]
+
+[ext_resource type="Texture2D" uid="uid://dlnp7dl04e4c7" path="res://Art/dream_bedroom.png" id="1_rsovy"]
+[ext_resource type="Script" uid="uid://cbituf6ivfln0" path="res://Scripts/Props/Npc.cs" id="2_npc"]
+[ext_resource type="Texture2D" uid="uid://blbutd71i3v30" path="res://Art/brother_unwell_transparent.png" id="2_unwell"]
+[ext_resource type="Script" uid="uid://c8feghsa4b1ln" path="res://Scripts/Props/Gramophone.cs" id="3_gram"]
+[ext_resource type="Texture2D" uid="uid://cgoh6djhugjsg" path="res://Art/brother_transparent.png" id="3_well"]
+[ext_resource type="PackedScene" uid="uid://bmednj0jlxh6f" path="res://Scenes/World/room_transition.tscn" id="4_door"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/Panels/GramophonePanel.tscn" id="5_gpanel"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(1324, 239)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_left"]
+size = Vector2(176, 952)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_right"]
+size = Vector2(303, 799.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_interact"]
+size = Vector2(80, 80)
+
+[node name="DreamBedroom" type="Node2D" unique_id=432601491]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=917632455]
+modulate = Color(0.7, 0.7, 1, 1)
+texture = ExtResource("1_rsovy")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1514096285]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1438784826]
+position = Vector2(0, 476)
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D" unique_id=589426497]
+position = Vector2(584, -1)
+shape = SubResource("RectangleShape2D_left")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D" unique_id=1826023155]
+position = Vector2(-463, -9)
+shape = SubResource("RectangleShape2D_right")
+
+[node name="Spawns" type="Node" parent="." unique_id=1467931121]
+
+[node name="Spawn_Start" type="Marker2D" parent="Spawns" unique_id=1039624530]
+position = Vector2(-242, 135)
+
+[node name="Props" type="Node2D" parent="." unique_id=1192959540]
+
+[node name="Brother" type="Area2D" parent="Props" unique_id=825825892]
+position = Vector2(168, 115)
+scale = Vector2(2, 3)
+script = ExtResource("2_npc")
+NpcName = "Brother"
+RepeatText = "*He is unwell. He can't speak.*"
+ConversationFlag = "brother.talked"
+DialogueLines = Array[String](["Hey, sis... thanks for coming.", "...", "I've been feeling strange lately.", "Like something's pulling at me...", "The music... it's the only thing that helps.", "...I'm sorry, I can't talk anymore.", "It's getting hard to breathe...", "*He slumps forward, unable to speak*"])
+UnwellTexture = ExtResource("2_unwell")
+WellTexture = ExtResource("3_well")
+WellFlag = "brother.well"
+
+[node name="Sprite2D" type="Sprite2D" parent="Props/Brother" unique_id=1122334455]
+position = Vector2(4.0000005, 23.333334)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_well")
+
+[node name="BrotherCollision" type="CollisionShape2D" parent="Props/Brother" unique_id=1807040254]
+position = Vector2(-7, 23.333334)
+shape = SubResource("RectangleShape2D_interact")
+debug_color = Color(0.4, 0.8, 0.4, 0.4)
+
+[node name="Gramophone" type="Area2D" parent="Props" unique_id=1952529863]
+position = Vector2(-77, 53)
+scale = Vector2(2, 3)
+script = ExtResource("3_gram")
+GramophonePanelScene = ExtResource("5_gpanel")
+RequiredFlag = "brother.talked"
+
+[node name="GramophoneCollision" type="CollisionShape2D" parent="Props/Gramophone" unique_id=1256301011]
+position = Vector2(-20, 16.666668)
+shape = SubResource("RectangleShape2D_interact")
+debug_color = Color(0.8, 0.6, 0.2, 0.4)
+
+[node name="DoorToFinale" parent="Props" unique_id=1379716109 instance=ExtResource("4_door")]
+position = Vector2(325, 16)
+scale = Vector2(0.5, 0.5)
+TargetRoomScene = "Finale"
+TargetSpawnPath = "Spawns/Spawn_Start"
+StartsLocked = true
+PersistentId = "dream_door"
+UnlockFlagKey = "brother.well"

@@ -1,18 +1,29 @@
+using System;
 using Godot;
 
 public partial class Hud : CanvasLayer
 {
 	[Export] public NodePath PlayerPath { get; set; }
-	[Export] public PackedScene? HotbarSlotScene { get; set; }
+	[Export] public PackedScene HotbarSlotScene { get; set; }
 
-	private PlayerController _player = null!;
-
-	private HBoxContainer _hotbarSlots = null!;
-	private Label _promptLabel = null!;
-	private Label _healthLabel = null!;
-	private InteractionPanelContainer _interactionPanel = null!;
+	private PlayerController _player;
+	private HBoxContainer _hotbarSlots;
+	private Label _promptLabel;
+	private Label _healthLabel;
+	private Label _dialogueLabel;
+	private InteractionPanelContainer _interactionPanel;
 
 	private HotbarSlot[] _slots;
+
+	private bool _dialogueActive;
+	private string[] _dialogueLines;
+	private string _dialogueNpcName;
+	private int _dialogueIndex;
+	private string _dialogueRepeatText;
+	private string _dialogueCompleteFlag;
+	private bool _showingRepeat;
+
+	public bool IsDialogueActive => _dialogueActive;
 
 	public override void _Ready()
 	{
@@ -24,6 +35,9 @@ public partial class Hud : CanvasLayer
 		_promptLabel = GetNode<Label>("Panel/MarginContainer/VBoxContainer/PromptLabel");
 		_healthLabel = GetNode<Label>("Panel/MarginContainer/VBoxContainer/HealthLabel");
 		_interactionPanel = GetNode<InteractionPanelContainer>("InteractionPanelContainer");
+		_dialogueLabel = GetNode<Label>("DialogueLabel");
+
+		_dialogueLabel.Visible = false;
 
 		BuildHotbar();
 
@@ -37,9 +51,88 @@ public partial class Hud : CanvasLayer
 		UpdatePrompt();
 	}
 
-	public void OpenInteractionPanel(PackedScene panelScene, ItemData? context)
+	public override void _Input(InputEvent @event)
+	{
+		if (_dialogueActive && @event.IsActionPressed("ui_cancel"))
+		{
+			GetViewport().SetInputAsHandled();
+			AdvanceDialogue();
+		}
+	}
+
+	public void OpenInteractionPanel(PackedScene panelScene, ItemData context)
 	{
 		_interactionPanel.OpenPanel(panelScene, context);
+	}
+
+	public void StartDialogue(string npcName, string[] lines, string repeatText, string completeFlag)
+	{
+		if (lines == null || lines.Length == 0)
+			return;
+
+		if (_dialogueActive && _dialogueNpcName == npcName)
+			return;
+
+		_dialogueNpcName = npcName;
+		_dialogueLines = lines;
+		_dialogueRepeatText = repeatText;
+		_dialogueCompleteFlag = completeFlag;
+		_dialogueIndex = 0;
+		_showingRepeat = false;
+
+		_dialogueLabel.Text = $"{npcName}: {lines[0]}";
+		_dialogueLabel.Visible = true;
+		_dialogueActive = true;
+	}
+
+	public void ShowDialogueText(string text)
+	{
+		_dialogueActive = true;
+		_showingRepeat = true;
+		_dialogueLines = null;
+		_dialogueLabel.Text = text;
+		_dialogueLabel.Visible = true;
+	}
+
+	private void AdvanceDialogue()
+	{
+		if (_showingRepeat)
+		{
+			CloseDialogue();
+			return;
+		}
+
+		_dialogueIndex++;
+
+		if (_dialogueIndex >= _dialogueLines.Length)
+		{
+			if (!string.IsNullOrEmpty(_dialogueRepeatText))
+			{
+				_dialogueLabel.Text = _dialogueRepeatText;
+				_showingRepeat = true;
+			}
+			else
+			{
+				CloseDialogue();
+			}
+		}
+		else
+		{
+			_dialogueLabel.Text = $"{_dialogueNpcName}: {_dialogueLines[_dialogueIndex]}";
+		}
+	}
+
+	private void CloseDialogue()
+	{
+		_dialogueLabel.Visible = false;
+		_dialogueActive = false;
+
+		if (!string.IsNullOrEmpty(_dialogueCompleteFlag))
+		{
+			var state = GameStateLocator.Find(this);
+			if (state != null)
+				state.SetFlag(_dialogueCompleteFlag, true);
+		}
 	}
 
 	private void BuildHotbar()
@@ -75,7 +168,7 @@ public partial class Hud : CanvasLayer
 		}
 	}
 
-	private void OnSelectionChanged(int index, ItemData? item)
+	private void OnSelectionChanged(int index, ItemData item)
 	{
 		RefreshHotbar();
 		UpdatePrompt();

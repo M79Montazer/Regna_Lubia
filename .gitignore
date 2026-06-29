@@ -365,3 +365,5 @@ FodyWeavers.xsd
 .Godot/
 /AGENTS.md
 /TODO.txt
+/codebaseExtractor.py
+/codebase.txt

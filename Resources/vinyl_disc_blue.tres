@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="VinylRecordItemData" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Items/VinylRecordItemData.cs" id="1_bl1"]
+[ext_resource type="Texture2D" path="res://Art/disc_blue.svg" id="2_bl2"]
+[ext_resource type="PackedScene" uid="uid://dj6x68n1g7oi4" path="res://Scenes/UI/Panels/BookPanel.tscn" id="3_bl3"]
+
+[resource]
+script = ExtResource("1_bl1")
+DiscId = "disc_blue"
+ReadableText = "A deep blue disc, cool to the touch. The label describes a lullaby once sung to calm restless hearts. The title reads: 'Ocean's Cradle'"
+ItemId = "vinyl_disc_blue"
+DisplayName = "Blue Vinyl"
+Icon = ExtResource("2_bl2")
+PanelScene = ExtResource("3_bl3")
+CanBePicked = true

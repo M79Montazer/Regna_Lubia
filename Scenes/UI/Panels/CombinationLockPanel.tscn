@@ -3,99 +3,105 @@
 [ext_resource type="Script" uid="uid://dwuoxxbyn0mdp" path="res://Scripts/UI/Panels/CombinationLockPanel.cs" id="1_ddsp1"]
 
 [node name="CombinationLockPanel" type="PanelContainer" unique_id=2047016597]
-offset_right = 291.0
-offset_bottom = 247.0
+offset_right = 360.0
+offset_bottom = 320.0
 script = ExtResource("1_ddsp1")
 CorrectCode = "2010"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=890391950]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=1052498590]
+[node name="DescriptionLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 alignment = 1
 
-[node name="Digit0" type="VBoxContainer" parent="VBoxContainer/HBoxContainer" unique_id=2067560391]
+[node name="Digit0" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="+" type="Button" parent="VBoxContainer/HBoxContainer/Digit0" unique_id=1719845956]
-layout_mode = 2
-text = "+"
-flat = true
-
-[node name="Value" type="Label" parent="VBoxContainer/HBoxContainer/Digit0" unique_id=257602617]
-layout_mode = 2
-text = "0"
-horizontal_alignment = 1
-
-[node name="-" type="Button" parent="VBoxContainer/HBoxContainer/Digit0" unique_id=620095384]
-layout_mode = 2
-text = "-"
-flat = true
-
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer" unique_id=889913635]
-layout_mode = 2
-
-[node name="Digit1" type="VBoxContainer" parent="VBoxContainer/HBoxContainer" unique_id=1863518455]
-layout_mode = 2
-
-[node name="+" type="Button" parent="VBoxContainer/HBoxContainer/Digit1" unique_id=2011357488]
+[node name="+" type="Button" parent="VBoxContainer/HBoxContainer/Digit0"]
 layout_mode = 2
 text = "+"
 flat = true
 
-[node name="Value" type="Label" parent="VBoxContainer/HBoxContainer/Digit1" unique_id=1798505218]
+[node name="Value" type="Label" parent="VBoxContainer/HBoxContainer/Digit0"]
 layout_mode = 2
 text = "0"
 horizontal_alignment = 1
 
-[node name="-" type="Button" parent="VBoxContainer/HBoxContainer/Digit1" unique_id=2092232626]
+[node name="-" type="Button" parent="VBoxContainer/HBoxContainer/Digit0"]
 layout_mode = 2
 text = "-"
 flat = true
 
-[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer" unique_id=1398034970]
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="Digit2" type="VBoxContainer" parent="VBoxContainer/HBoxContainer" unique_id=789282325]
+[node name="Digit1" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="+" type="Button" parent="VBoxContainer/HBoxContainer/Digit2" unique_id=1755097657]
+[node name="+" type="Button" parent="VBoxContainer/HBoxContainer/Digit1"]
 layout_mode = 2
 text = "+"
 flat = true
 
-[node name="Value" type="Label" parent="VBoxContainer/HBoxContainer/Digit2" unique_id=1394606156]
+[node name="Value" type="Label" parent="VBoxContainer/HBoxContainer/Digit1"]
 layout_mode = 2
 text = "0"
 horizontal_alignment = 1
 
-[node name="-" type="Button" parent="VBoxContainer/HBoxContainer/Digit2" unique_id=178653223]
+[node name="-" type="Button" parent="VBoxContainer/HBoxContainer/Digit1"]
 layout_mode = 2
 text = "-"
 flat = true
 
-[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer" unique_id=1542104943]
+[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="Digit3" type="VBoxContainer" parent="VBoxContainer/HBoxContainer" unique_id=873529883]
+[node name="Digit2" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="+" type="Button" parent="VBoxContainer/HBoxContainer/Digit3" unique_id=325414110]
+[node name="+" type="Button" parent="VBoxContainer/HBoxContainer/Digit2"]
 layout_mode = 2
 text = "+"
 flat = true
 
-[node name="Value" type="Label" parent="VBoxContainer/HBoxContainer/Digit3" unique_id=51530642]
+[node name="Value" type="Label" parent="VBoxContainer/HBoxContainer/Digit2"]
 layout_mode = 2
 text = "0"
 horizontal_alignment = 1
 
-[node name="-" type="Button" parent="VBoxContainer/HBoxContainer/Digit3" unique_id=1274401286]
+[node name="-" type="Button" parent="VBoxContainer/HBoxContainer/Digit2"]
 layout_mode = 2
 text = "-"
 flat = true
 
-[node name="OpenButton" type="Button" parent="VBoxContainer" unique_id=1518788662]
+[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Digit3" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="+" type="Button" parent="VBoxContainer/HBoxContainer/Digit3"]
+layout_mode = 2
+text = "+"
+flat = true
+
+[node name="Value" type="Label" parent="VBoxContainer/HBoxContainer/Digit3"]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="-" type="Button" parent="VBoxContainer/HBoxContainer/Digit3"]
+layout_mode = 2
+text = "-"
+flat = true
+
+[node name="OpenButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Open"

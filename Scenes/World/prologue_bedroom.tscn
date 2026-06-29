@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://da0t8j4ontwl1"]
+
+[ext_resource type="Texture2D" uid="uid://bmur10m0fgmd0" path="res://Art/room2_edit2.png" id="1_bg"]
+[ext_resource type="PackedScene" uid="uid://bmednj0jlxh6f" path="res://Scenes/World/room_transition.tscn" id="2_trans"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(1324, 239)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_left"]
+size = Vector2(176, 952)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_right"]
+size = Vector2(303, 799.5)
+
+[node name="PrologueBedroom" type="Node2D" unique_id=1204891098]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=632882472]
+texture = ExtResource("1_bg")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1060645419]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1325990279]
+position = Vector2(0, 476)
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D" unique_id=324496640]
+position = Vector2(699, -4)
+shape = SubResource("RectangleShape2D_left")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D" unique_id=1458263641]
+position = Vector2(-708, 37)
+shape = SubResource("RectangleShape2D_right")
+
+[node name="Spawns" type="Node" parent="." unique_id=2101522420]
+
+[node name="Spawn_Start" type="Marker2D" parent="Spawns" unique_id=2119881927]
+position = Vector2(-334, 180)
+
+[node name="Props" type="Node2D" parent="." unique_id=806227043]
+
+[node name="Bed" parent="Props" unique_id=1736128487 instance=ExtResource("2_trans")]
+position = Vector2(-306, 217)
+rotation = -1.5707964
+scale = Vector2(0.4, 0.5)
+LabelText = "Bed"
+TargetRoomScene = "Workroom"
+TargetSpawnPath = "Spawns/Spawn_Start"
