@@ -173,6 +173,16 @@ public partial class Hud : CanvasLayer
 		RefreshHotbar();
 		UpdatePrompt();
 
+		if (item is VinylRecordItemData vinyl
+			&& _interactionPanel.IsOpen
+			&& _interactionPanel.ActivePanel is GramophonePanel gp)
+		{
+			gp.InsertDisc(vinyl);
+			_player.Inventory.ClearSelection();
+			RefreshHotbar();
+			return;
+		}
+
 		if (item?.PanelScene != null)
 		{
 			OpenInteractionPanel(item.PanelScene, item);

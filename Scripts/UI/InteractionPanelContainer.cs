@@ -2,6 +2,9 @@ using Godot;
 
 public partial class InteractionPanelContainer : Panel
 {
+	public bool IsOpen => Visible;
+	public IInteractablePanel ActivePanel => _activePanel;
+
 	private PanelContainer _contentContainer;
 	private IInteractablePanel _activePanel;
 

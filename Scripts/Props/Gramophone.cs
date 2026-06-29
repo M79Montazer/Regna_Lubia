@@ -12,9 +12,6 @@ public partial class Gramophone : Area2D, IInteractable
 		if (state == null)
 			return $"Examine {LabelText}";
 
-		if (!string.IsNullOrEmpty(RequiredFlag) && !state.GetFlag(RequiredFlag))
-			return "";
-
 		if (state.GetFlag("brother.well"))
 			return $"{LabelText} (played)";
 
@@ -41,8 +38,7 @@ public partial class Gramophone : Area2D, IInteractable
 			return;
 		}
 
-		var hud = GetTree().GetFirstNodeInGroup("hud") as Hud;
-		if (hud == null)
+        if (GetTree().GetFirstNodeInGroup("hud") is not Hud hud)
 		{
 			GD.PrintErr("Hud not found");
 			return;

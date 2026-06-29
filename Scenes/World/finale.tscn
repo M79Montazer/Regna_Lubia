@@ -1,28 +1,48 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://csfm58lvlcgm3"]
 
 [ext_resource type="PackedScene" uid="uid://cruxm2svouvos" path="res://Scenes/World/pickup_item.tscn" id="1_pick"]
-[ext_resource type="Resource" path="res://Resources/finale_note.tres" id="2_note"]
+[ext_resource type="Texture2D" uid="uid://dm0gllfogbkj3" path="res://Art/Balcony.png" id="1_tke4i"]
+[ext_resource type="Resource" uid="uid://d20chdcu7186w" path="res://Resources/finale_note.tres" id="2_note"]
+[ext_resource type="Texture2D" uid="uid://nfjk43868em" path="res://Art/letter.png" id="4_424yi"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b7h74"]
+size = Vector2(165, 593)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
 size = Vector2(1324, 239)
 
-[node name="Finale" type="Node2D"]
+[node name="Finale" type="Node2D" unique_id=887414114]
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1103040618]
+texture = ExtResource("1_tke4i")
 
-[node name="StaticBody2D" type="StaticBody2D" parent="."]
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=2121733525]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(0, 476)
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D" unique_id=285392819]
+position = Vector2(618, -41)
+shape = SubResource("RectangleShape2D_b7h74")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1495733715]
+position = Vector2(-66, 341)
 shape = SubResource("RectangleShape2D_floor")
 
-[node name="Spawns" type="Node" parent="."]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D" unique_id=107950774]
+position = Vector2(-647.5, -10.5)
+shape = SubResource("RectangleShape2D_b7h74")
 
-[node name="Spawn_Start" type="Marker2D" parent="Spawns"]
-position = Vector2(0, 180)
+[node name="Spawns" type="Node" parent="." unique_id=2128390069]
 
-[node name="Props" type="Node2D" parent="."]
+[node name="Spawn_Start" type="Marker2D" parent="Spawns" unique_id=1799594758]
+position = Vector2(-400, 100)
 
-[node name="ThanksNote" parent="Props" instance=ExtResource("1_pick")]
-position = Vector2(0, 180)
+[node name="Props" type="Node2D" parent="." unique_id=200112758]
+
+[node name="ThanksNote" parent="Props" unique_id=958943700 instance=ExtResource("1_pick")]
+position = Vector2(-55, 99)
+scale = Vector2(0.5, 0.5)
 Item = ExtResource("2_note")
+
+[node name="Sprite2D" type="Sprite2D" parent="Props/ThanksNote" unique_id=1306862109]
+position = Vector2(44, 116)
+scale = Vector2(0.31835938, 0.37304688)
+texture = ExtResource("4_424yi")

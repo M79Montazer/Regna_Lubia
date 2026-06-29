@@ -35,12 +35,56 @@ public partial class GramophonePanel : PanelContainer, IInteractablePanel
 			return;
 
 		_feedbackLabel.Text = "";
+
+		if (!state.GetFlag("gramophone.first_opened"))
+		{
+			state.SetString("gramophone.current_disc", "disc_broken");
+			state.SetFlag("gramophone.first_opened", true);
+		}
+
 		UpdateDisplay(state);
+	}
+
+	public bool InsertDisc(VinylRecordItemData vinyl)
+	{
+		var state = GameStateLocator.Require(this);
+		if (state == null)
+			return false;
+
+		var player = GetTree().GetFirstNodeInGroup("player") as PlayerController;
+		if (player == null)
+			return false;
+
+		string currentDisc = state.GetString("gramophone.current_disc", "");
+
+		if (!string.IsNullOrEmpty(currentDisc))
+		{
+			var oldDiscData = LoadDiscData(currentDisc);
+			if (oldDiscData != null && !player.Inventory.AddItem(oldDiscData))
+			{
+				_feedbackLabel.Text = "Inventory is full!";
+				return false;
+			}
+		}
+
+		for (int i = 0; i < player.Inventory.SlotCount; i++)
+		{
+			if (player.Inventory.GetSlot(i) == vinyl)
+			{
+				player.Inventory.RemoveItemAt(i);
+				break;
+			}
+		}
+
+		state.SetString("gramophone.current_disc", vinyl.DiscId);
+		_feedbackLabel.Text = $"Inserted: {vinyl.DisplayName}";
+		UpdateDisplay(state);
+		return true;
 	}
 
 	private void UpdateDisplay(GameState state)
 	{
-		string currentDisc = state.GetString("gramophone.current_disc", "");
+		var currentDisc = state.GetString("gramophone.current_disc");
 
 		if (string.IsNullOrEmpty(currentDisc))
 		{
@@ -50,13 +94,11 @@ public partial class GramophonePanel : PanelContainer, IInteractablePanel
 		else
 		{
 			var discData = LoadDiscData(currentDisc);
-			if (discData != null)
-				_slotIcon.Texture = discData.Icon;
-			else
-				_slotIcon.Texture = null;
+			_slotIcon.Texture = discData?.Icon;
 
-			bool alreadyPlayed = state.GetFlag("brother.well");
-			_playButton.Disabled = alreadyPlayed;
+			bool isBroken = currentDisc == "disc_broken";
+			var alreadyPlayed = state.GetFlag("brother.well");
+			_playButton.Disabled = isBroken || alreadyPlayed;
 		}
 	}
 
@@ -126,9 +168,11 @@ public partial class GramophonePanel : PanelContainer, IInteractablePanel
 		UpdateDisplay(state);
 	}
 
-	private VinylRecordItemData LoadDiscData(string discId)
+	private static VinylRecordItemData LoadDiscData(string discId)
 	{
-		string color = discId.Replace("disc_", "");
+		if (discId == "disc_broken")
+			return ResourceLoader.Load<VinylRecordItemData>("res://Resources/vinyl_disc_broken.tres");
+		var color = discId.Replace("disc_", "");
 		return ResourceLoader.Load<VinylRecordItemData>($"res://Resources/vinyl_disc_{color}.tres");
 	}
 
@@ -138,7 +182,7 @@ public partial class GramophonePanel : PanelContainer, IInteractablePanel
 		if (state == null)
 			return;
 
-		string currentDisc = state.GetString("gramophone.current_disc", "");
+		var currentDisc = state.GetString("gramophone.current_disc");
 
 		if (string.IsNullOrEmpty(currentDisc))
 		{
@@ -162,7 +206,7 @@ public partial class GramophonePanel : PanelContainer, IInteractablePanel
 	{
 		var state = GameStateLocator.Require(this);
 
-		bool wasFirstClose = state != null && !state.GetFlag("gramophone.examined");
+		var wasFirstClose = state != null && !state.GetFlag("gramophone.examined");
 		state?.SetFlag("gramophone.examined", true);
 
 		Closed?.Invoke();

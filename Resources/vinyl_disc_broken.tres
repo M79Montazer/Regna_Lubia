@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="VinylRecordItemData" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Items/VinylRecordItemData.cs" id="1_b1"]
+[ext_resource type="Texture2D" path="res://Art/broken_vinyl.png" id="2_b2"]
+
+[resource]
+script = ExtResource("1_b1")
+DiscId = "disc_broken"
+ReadableText = "A shattered vinyl disc. The grooves are too damaged to play. Perhaps there's a working replacement somewhere..."
+ItemId = "vinyl_disc_broken"
+DisplayName = "Broken Vinyl"
+Icon = ExtResource("2_b2")
+PanelScene = null
+CanBePicked = false
