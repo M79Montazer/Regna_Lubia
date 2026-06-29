@@ -11,7 +11,7 @@ public partial class DisplayGlass : Area2D, IInteractable
 	public string GetPromptText(PlayerController player)
 	{
 		var state = GameStateLocator.Find(this);
-		if (state != null && state.GetFlag("discs_collected"))
+		if (state != null && (state.GetFlag("discs_collected") ?? false))
 			return $"{LabelText} (empty)";
 		return $"Examine {LabelText}";
 	}
@@ -27,13 +27,13 @@ public partial class DisplayGlass : Area2D, IInteractable
 		if (state == null)
 			return;
 
-		if (state.GetFlag("discs_collected"))
+		if ((state.GetFlag("discs_collected") ?? false))
 		{
 			ShowBookPanel(LabelText, EmptyText);
 			return;
 		}
 
-		if (!state.GetFlag("dream_visited"))
+		if (!(state.GetFlag("dream_visited") ?? false))
 		{
 			ShowBookPanel(LabelText, InitialText);
 			return;

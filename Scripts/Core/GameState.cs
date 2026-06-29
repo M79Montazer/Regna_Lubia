@@ -29,14 +29,17 @@ public partial class GameState : Node
 		AddToGroup("game_state");
 	}
 
-	public bool GetFlag(string key, bool defaultValue = false)
+	public bool? GetFlag(string key, bool defaultValue = false)
 	{
 		if (string.IsNullOrEmpty(key))
 		{
 			GD.PushWarning("GameState.GetFlag called with null/empty key.");
 			return defaultValue;
 		}
-		return _flags.GetValueOrDefault(key, defaultValue);
+		if(_flags.ContainsKey(key))
+		    return _flags.GetValueOrDefault(key, defaultValue);
+		else
+			return null;
 	}
 
 	public void SetFlag(string key, bool value)

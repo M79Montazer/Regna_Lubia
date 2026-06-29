@@ -15,7 +15,6 @@ public partial class Hud : CanvasLayer
 
 	private HotbarSlot[] _slots;
 
-	private bool _dialogueActive;
 	private string[] _dialogueLines;
 	private string _dialogueNpcName;
 	private int _dialogueIndex;
@@ -23,7 +22,10 @@ public partial class Hud : CanvasLayer
 	private string _dialogueCompleteFlag;
 	private bool _showingRepeat;
 
-	public bool IsDialogueActive => _dialogueActive;
+	private event Action DialogueIsDone;
+
+
+	public bool IsDialogueActive { get; private set; }
 
 	public override void _Ready()
 	{
@@ -53,7 +55,7 @@ public partial class Hud : CanvasLayer
 
 	public override void _Input(InputEvent @event)
 	{
-		if (_dialogueActive && @event.IsActionPressed("ui_cancel"))
+		if (IsDialogueActive && @event.IsActionPressed("ui_cancel"))
 		{
 			GetViewport().SetInputAsHandled();
 			AdvanceDialogue();
@@ -65,12 +67,12 @@ public partial class Hud : CanvasLayer
 		_interactionPanel.OpenPanel(panelScene, context);
 	}
 
-	public void StartDialogue(string npcName, string[] lines, string repeatText, string completeFlag)
+	public void StartDialogue(string npcName, string[] lines, string repeatText, string completeFlag, Action dialogueDone)
 	{
 		if (lines == null || lines.Length == 0)
 			return;
 
-		if (_dialogueActive && _dialogueNpcName == npcName)
+		if (IsDialogueActive && _dialogueNpcName == npcName)
 			return;
 
 		_dialogueNpcName = npcName;
@@ -82,12 +84,14 @@ public partial class Hud : CanvasLayer
 
 		_dialogueLabel.Text = $"{npcName}: {lines[0]}";
 		_dialogueLabel.Visible = true;
-		_dialogueActive = true;
+		IsDialogueActive = true;
+
+		DialogueIsDone += dialogueDone;
 	}
 
 	public void ShowDialogueText(string text)
 	{
-		_dialogueActive = true;
+		IsDialogueActive = true;
 		_showingRepeat = true;
 		_dialogueLines = null;
 		_dialogueLabel.Text = text;
@@ -125,7 +129,7 @@ public partial class Hud : CanvasLayer
 	private void CloseDialogue()
 	{
 		_dialogueLabel.Visible = false;
-		_dialogueActive = false;
+		IsDialogueActive = false;
 
 		if (!string.IsNullOrEmpty(_dialogueCompleteFlag))
 		{
@@ -133,6 +137,10 @@ public partial class Hud : CanvasLayer
 			if (state != null)
 				state.SetFlag(_dialogueCompleteFlag, true);
 		}
+
+		DialogueIsDone?.Invoke();
+		DialogueIsDone = null;
+
 	}
 
 	private void BuildHotbar()

@@ -25,7 +25,7 @@ public partial class StatefulButton : Area2D, IInteractable
 		if (!string.IsNullOrEmpty(PersistentId) && _state != null)
 		{
 			var key = GetPressedFlagKey();
-			_pressed = _state.HasFlag(key) ? _state.GetFlag(key) : StartsPressed;
+			_pressed = _state.GetFlag(key) ?? StartsPressed;
 		}
 		else
 		{

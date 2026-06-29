@@ -22,7 +22,7 @@ public partial class PickupItem : Area2D, IInteractable
 			if (Item is CombinationLockItemData combinationLock)
 			{
 				var gameFlag = $"lock.{combinationLock.LockId}.unlocked";
-				if (state.GetFlag(gameFlag))
+				if ((state.GetFlag(gameFlag) ?? false))
 				{
 					QueueFree();
 				}

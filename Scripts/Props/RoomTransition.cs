@@ -31,7 +31,7 @@ public partial class RoomTransition : Area2D, IInteractable
 		{
 			var lockKey = $"door.{PersistentId}.locked";
 			if (state.HasFlag(lockKey))
-				_locked = state.GetFlag(lockKey);
+				_locked = (state.GetFlag(lockKey) ?? StartsLocked);
 			else
 				_locked = StartsLocked;
 		}
@@ -48,7 +48,7 @@ public partial class RoomTransition : Area2D, IInteractable
 		if (state == null)
 			return;
 
-		if (!string.IsNullOrEmpty(UnlockFlagKey) && state.GetFlag(UnlockFlagKey))
+		if (!string.IsNullOrEmpty(UnlockFlagKey) && (state.GetFlag(UnlockFlagKey)??false))
 		{
 			_locked = false;
 			return;

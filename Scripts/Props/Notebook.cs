@@ -15,11 +15,8 @@ public partial class Notebook : Area2D, IInteractable
 		if (state == null)
 			return $"Open {LabelText}";
 
-		if (!state.GetFlag($"lock.{LockId}.unlocked"))
+		if (!(state.GetFlag($"lock.{LockId}.unlocked")??false))
 			return $"Open {LabelText} (locked)";
-
-		if (state.GetFlag("dream_visited") && !state.GetFlag("discs_collected"))
-			return $"{LabelText} (locked)";
 
 		return $"Open {LabelText}";
 	}
@@ -35,7 +32,7 @@ public partial class Notebook : Area2D, IInteractable
 		if (state == null)
 			return;
 
-		if (!state.GetFlag($"lock.{LockId}.unlocked"))
+		if (!(state.GetFlag($"lock.{LockId}.unlocked") ?? false))
 		{
 			var hud = GetTree().GetFirstNodeInGroup("hud") as Hud;
 			var panelScene = GD.Load<PackedScene>("res://Scenes/UI/Panels/CombinationLockPanel.tscn");
@@ -52,7 +49,7 @@ public partial class Notebook : Area2D, IInteractable
 			return;
 		}
 
-		if (!state.GetFlag("dream_visited"))
+		if (!(state.GetFlag("dream_visited") ?? false))
 		{
 			state.SetFlag("dream_visited", true);
 			var roomManager = GetTree().GetFirstNodeInGroup("room_manager") as RoomManager;
@@ -60,7 +57,7 @@ public partial class Notebook : Area2D, IInteractable
 			return;
 		}
 
-		if (!state.GetFlag("discs_collected"))
+		if (!(state.GetFlag("discs_collected") ?? false))
 		{
 			ShowBookPanel(LabelText, "I should examine the display case first...");
 			return;
