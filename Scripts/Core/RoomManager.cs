@@ -12,6 +12,8 @@ public partial class RoomManager : Node
 
 	[Export] public string InitialSpawnPath = "Spawns/Spawn_Start";
 
+	[Export] public float CameraLimitPadding { get; set; } = 50f;
+
 	private Node2D _roomContainer = null!;
 	private PlayerController _player = null!;
 	private Node2D _currentRoom;
@@ -60,6 +62,38 @@ public partial class RoomManager : Node
 		{
 			GD.PushWarning($"Spawn marker '{spawnMarkerPath}' not found in room '{roomScene.ResourcePath}'.");
 		}
+
+		ApplyCameraLimits();
+	}
+
+	private void ApplyCameraLimits()
+	{
+		var sprite = _currentRoom?.GetNodeOrNull<Sprite2D>("Sprite2D");
+		if (sprite == null || sprite.Texture == null)
+			return;
+
+		var padding = CameraLimitPadding;
+
+		var textureSize = sprite.Texture.GetSize();
+		var scale = sprite.Scale;
+		var pos = sprite.GlobalPosition;
+
+		//var left = pos.X + padding;
+		//var right = pos.X + textureSize.X * scale.X - padding;
+		//var top = pos.Y + padding;
+		//var bottom = pos.Y + textureSize.Y * scale.Y - padding;
+		var localRect = sprite.GetRect();
+
+		var topLeft = sprite.ToGlobal(localRect.Position);
+		var bottomRight = sprite.ToGlobal(localRect.End);
+
+		var left = topLeft.X + padding;
+		var right = bottomRight.X - padding;
+		var top = topLeft.Y + padding;
+		var bottom = bottomRight.Y - padding;
+
+		_player ??= GetNode<PlayerController>(PlayerPath);
+		_player.SetCameraLimits(left, right, top, bottom);
 	}
 
 	public static PackedScene GetSceneFromId(string id)
@@ -81,5 +115,5 @@ public partial class RoomManager : Node
 
 		GD.PushError($"Could not load room scene for id '{id}'.");
 		return null;
-}
+	}
 }

@@ -11,6 +11,7 @@ public partial class PlayerController : CharacterBody2D
 	public InteractionDetector InteractionDetector { get; private set; } = null!;
 
 	private Sprite2D _sprite = null!;
+	private Camera2D _camera = null!;
 	public bool FacingRight { get; private set; } = true;
 
 	public override void _Ready()
@@ -18,6 +19,7 @@ public partial class PlayerController : CharacterBody2D
 		AddToGroup("player");
 
 		_sprite = GetNode<Sprite2D>("Sprite2D");
+		_camera ??= GetNode<Camera2D>("Camera2D");
 		Inventory = GetNode<Inventory>("Inventory");
 		Health = GetNode<Health>("Health");
 		Combat = GetNode<PlayerCombat>("Combat");
@@ -66,6 +68,15 @@ public partial class PlayerController : CharacterBody2D
 		FacingRight = facingRight;
 		_sprite.FlipH = !facingRight;
 		Combat.SetFacingRight(facingRight);
+	}
+
+	public void SetCameraLimits(float left, float right, float top, float bottom)
+	{
+		_camera ??= GetNode<Camera2D>("Camera2D");
+		_camera.LimitLeft = Mathf.RoundToInt(left);
+		_camera.LimitRight = Mathf.RoundToInt(right);
+		_camera.LimitTop = Mathf.RoundToInt(top);
+		_camera.LimitBottom = Mathf.RoundToInt(bottom);
 	}
 
 	public void TeleportTo(Vector2 worldPosition)
